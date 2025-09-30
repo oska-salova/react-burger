@@ -71,7 +71,7 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 	}, [currentTab]);
 
 	return (
-		<section className="mt-10">
+		<section className={`${styles.burgerIngredients} mt-10`}>
 			<h1 className="text text_type_main-large mb-5">Соберите бургер</h1>
 			<div className={`${styles.tabs} mb-10`}>
 				{ingredientGroups.map(([type], index) => {

@@ -1,4 +1,9 @@
-import { ConstructorElement } from '@ya.praktikum/react-developer-burger-ui-components';
+import {
+	Button,
+	ConstructorElement,
+	CurrencyIcon,
+	DragIcon,
+} from '@ya.praktikum/react-developer-burger-ui-components';
 import styles from './burger-constructor.module.css';
 import { BurgerIngredient } from '../../model/burger';
 import { useLayoutEffect, useRef } from 'react';
@@ -6,6 +11,7 @@ import { useLayoutEffect, useRef } from 'react';
 interface BurgerConstructorProps {
 	bun: BurgerIngredient;
 	customIngredients: BurgerIngredient[];
+	price: number;
 }
 
 function BurgerConstructor(props: BurgerConstructorProps) {
@@ -28,33 +34,48 @@ function BurgerConstructor(props: BurgerConstructorProps) {
 	}, []);
 
 	return (
-		<section className="mt-25">
-			<ConstructorElement
-				type="top"
-				isLocked={true}
-				text={props.bun.name}
-				price={props.bun.price}
-				thumbnail={props.bun.image_mobile}
-			/>
-			<ul className={styles.customIngredients} ref={ingredientsRef}>
-				{props.customIngredients.map(ingredient => (
-					<li key={ingredient._id} className={styles.ingredient}>
-						<ConstructorElement
-							text={ingredient.name}
-							price={ingredient.price}
-							thumbnail={ingredient.image_mobile}
-						/>
-					</li>
-				))}
-			</ul>
-			<ConstructorElement
-				type="bottom"
-				isLocked={true}
-				text={props.bun.name}
-				price={props.bun.price}
-				thumbnail={props.bun.image_mobile}
-				extraClass="mb-10"
-			/>
+		<section className={`${styles.burgerConstructor} mt-25`}>
+			<section className={styles.burger}>
+				<ConstructorElement
+					type="top"
+					isLocked={true}
+					text={props.bun.name}
+					price={props.bun.price}
+					thumbnail={props.bun.image_mobile}
+					extraClass="mr-4"
+				/>
+				<ul className={styles.customIngredients} ref={ingredientsRef}>
+					{props.customIngredients.map(ingredient => (
+						<li key={ingredient._id} className={styles.ingredient}>
+							<div className="m-2">
+								<DragIcon type="primary" />
+							</div>
+							<ConstructorElement
+								text={ingredient.name}
+								price={ingredient.price}
+								thumbnail={ingredient.image_mobile}
+							/>
+						</li>
+					))}
+				</ul>
+				<ConstructorElement
+					type="bottom"
+					isLocked={true}
+					text={props.bun.name}
+					price={props.bun.price}
+					thumbnail={props.bun.image_mobile}
+					extraClass="mr-4"
+				/>
+			</section>
+			<section className={`${styles.footer} mr-4`}>
+				<div className={`${styles.price} mt-1 mb-1`}>
+					<p className="text text_type_digits-default">{props.price}</p>
+					<CurrencyIcon type="primary" />
+				</div>
+				<Button htmlType="button" type="primary" size="large">
+					Оформить заказ
+				</Button>
+			</section>
 		</section>
 	);
 }

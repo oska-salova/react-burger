@@ -1,23 +1,48 @@
-section {
+.burgerConstructor {
 	width: 50%;
 	display: flex;
 	flex-direction: column;
+	gap: 40px;
+}
+
+.burger {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
 	gap: 16px;
 }
 
 .customIngredients {
 	--top: 0px;
-	height: calc(100vh - var(--top) - 200px);
+	height: calc(100vh - var(--top) - 240px - var(--bottom-page-space));
 	min-height: 100px;
-	width: 100%;
+	width: fit-content;
 	overflow-y: auto;
 	display: flex;
 	flex-direction: column;
 	gap: 16px;
 	padding: 0;
+	padding-right: 8px;
 	margin: 0;
 }
 
 .ingredient {
-	display: block;
+	display: flex;
+	align-items: center;
+	gap: 0;
+}
+
+.footer {
+	display: flex;
+	justify-content: flex-end;
+	gap: 40px;
+}
+
+.price {
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: center;
+	align-items: center;
+	gap: 8px;
 }

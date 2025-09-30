@@ -7,7 +7,7 @@ import { ingredients } from './utils/data';
 const staticBun = ingredients.find(
 	ingredient => ingredient.type === SupportedIngredientTypes.bun,
 ) as BurgerIngredient;
-const selectedIngredients = generateRandomSelectedIngredients();
+const selectableIngredients = generateSelectableIngredients();
 
 function App() {
 	return (
@@ -16,7 +16,11 @@ function App() {
 			<main className="main">
 				<BurgerIngredients ingredients={ingredients} />
 				{staticBun && (
-					<BurgerConstructor bun={staticBun} customIngredients={selectedIngredients} />
+					<BurgerConstructor
+						bun={staticBun}
+						customIngredients={selectableIngredients}
+						price={0}
+					/>
 				)}
 			</main>
 		</>
@@ -25,15 +29,6 @@ function App() {
 
 export default App;
 
-function generateRandomSelectedIngredients(): BurgerIngredient[] {
-	const bunCleanedIngredients = ingredients.filter(
-		ingredient => ingredient.type !== SupportedIngredientTypes.bun,
-	);
-	if (!bunCleanedIngredients.length) {
-		return [];
-	}
-
-	return bunCleanedIngredients
-		.sort(() => Math.random() - 0.5)
-		.slice(0, Math.min(bunCleanedIngredients.length, 5));
+function generateSelectableIngredients(): BurgerIngredient[] {
+	return ingredients.filter(ingredient => ingredient.type !== SupportedIngredientTypes.bun);
 }
