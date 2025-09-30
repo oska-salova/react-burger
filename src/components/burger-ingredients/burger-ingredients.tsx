@@ -33,7 +33,7 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 					if (!groups.get(groupKey)) {
 						groups.set(groupKey, []);
 					}
-					groups.get(groupKey)!.push(ingredient);
+					groups.get(groupKey)?.push(ingredient);
 					return groups;
 				}, new Map<IngredientType, BurgerIngredient[]>()),
 		);
