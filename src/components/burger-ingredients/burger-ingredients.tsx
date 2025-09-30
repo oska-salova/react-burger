@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import styles from './burger-ingredients.module.css';
 import { Tab } from '@ya.praktikum/react-developer-burger-ui-components';
 import { BurgerIngredient, IngredientType, SupportedIngredientTypes } from '../../model/burger';
@@ -46,7 +46,7 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 		}
 	};
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		updateIngredientsTopPosition();
 		window.addEventListener('resize', updateIngredientsTopPosition);
 
@@ -55,7 +55,7 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 		};
 	}, []);
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		if (ingredientsRef?.current) {
 			// TODO implement scroll to group header
 			ingredientsRef.current.scrollTo({

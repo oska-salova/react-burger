@@ -1,7 +1,7 @@
 import { ConstructorElement } from '@ya.praktikum/react-developer-burger-ui-components';
 import styles from './burger-constructor.module.css';
 import { BurgerIngredient } from '../../model/burger';
-import { useEffect, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 
 interface BurgerConstructorProps {
 	bun: BurgerIngredient;
@@ -18,7 +18,7 @@ function BurgerConstructor(props: BurgerConstructorProps) {
 		}
 	};
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		updateCustomIngredientsTopPosition();
 		window.addEventListener('resize', updateCustomIngredientsTopPosition);
 
