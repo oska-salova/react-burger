@@ -1,0 +1,23 @@
+.header {
+	width: 100%;
+	height: var(--header-height);
+	background-color: var(--color-modal-bg);
+	display: flex;
+	justify-content: center;
+}
+
+.content {
+	width: 100%;
+	max-width: var(--content-max-width);
+	height: 100%;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 16px;
+}
+
+.block {
+	display: flex;
+	justify-content: start;
+	gap: 8px;
+}

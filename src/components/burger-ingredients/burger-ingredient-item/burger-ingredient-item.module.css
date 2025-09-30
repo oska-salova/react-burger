@@ -1,0 +1,16 @@
+.item {
+	position: relative;
+	max-width: 272px;
+}
+
+.price {
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: center;
+	gap: 8px;
+}
+
+.name {
+	text-align: center;
+	height: 48px;
+}

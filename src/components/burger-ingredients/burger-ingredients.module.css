@@ -1,0 +1,31 @@
+section {
+	width: 50%;
+	height: 100%;
+}
+
+.tabs {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.ingredients {
+	--top: 0px;
+	height: calc(100vh - var(--top));
+	width: 100%;
+	overflow-y: auto;
+}
+
+.ingredientsGroup {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+	gap: 24px 32px;
+	padding: 0;
+	margin: 0 0 40px 16px;
+}
+
+.ingredient {
+	display: block;
+	align-self: center;
+}
