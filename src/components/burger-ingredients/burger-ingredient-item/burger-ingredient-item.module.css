@@ -1,6 +1,7 @@
 .item {
 	position: relative;
 	max-width: 272px;
+	min-width: 272px;
 }
 
 .price {

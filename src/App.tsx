@@ -14,14 +14,16 @@ function App() {
 		<>
 			<AppHeader />
 			<main className="main">
-				<BurgerIngredients ingredients={ingredients} />
-				{staticBun && (
-					<BurgerConstructor
-						bun={staticBun}
-						customIngredients={selectableIngredients}
-						price={0}
-					/>
-				)}
+				<div className="main-content">
+					<BurgerIngredients ingredients={ingredients} />
+					{staticBun && (
+						<BurgerConstructor
+							bun={staticBun}
+							customIngredients={selectableIngredients}
+							price={0}
+						/>
+					)}
+				</div>
 			</main>
 		</>
 	);

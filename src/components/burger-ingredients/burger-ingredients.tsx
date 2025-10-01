@@ -41,7 +41,7 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 
 	const updateIngredientsTopPosition = () => {
 		if (ingredientsRef?.current) {
-			const ingredientsBounds = ingredientsRef.current.getBoundingClientRect() ?? 0;
+			const ingredientsBounds = ingredientsRef.current.getBoundingClientRect();
 			ingredientsRef.current.style.setProperty('--top', `${ingredientsBounds.top}px`);
 		}
 	};
@@ -72,7 +72,7 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 
 	return (
 		<section className={`${styles.burgerIngredients} mt-10`}>
-			<h1 className="text text_type_main-large mb-5">Соберите бургер</h1>
+			<h1 className={`${styles.header} text text_type_main-large mb-5`}>Соберите бургер</h1>
 			<div className={`${styles.tabs} mb-10`}>
 				{ingredientGroups.map(([type], index) => {
 					return (
@@ -90,7 +90,11 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 			<div className={styles.ingredients} ref={ingredientsRef}>
 				{ingredientGroups.map(([key, ingredients]) => (
 					<Fragment key={key}>
-						<p className="text text_type_main-medium mb-5">{TAB_NAME[key]}</p>
+						<p
+							className={`${styles.ingredientsGroupCaption} text text_type_main-medium mb-5`}
+						>
+							{TAB_NAME[key]}
+						</p>
 						<ul className={`${styles.ingredientsGroup}`}>
 							{ingredients.map(ingredient => (
 								<li key={ingredient._id} className={styles.ingredient}>

@@ -1,8 +1,10 @@
 .burgerConstructor {
 	width: 50%;
+	min-width: 620px;
 	display: flex;
 	flex-direction: column;
 	gap: 40px;
+	margin-top: 100px;
 }
 
 .burger {
@@ -11,6 +13,7 @@
 	flex-direction: column;
 	align-items: flex-end;
 	gap: 16px;
+	margin-top: 0;
 }
 
 .customIngredients {
@@ -45,4 +48,19 @@
 	justify-content: center;
 	align-items: center;
 	gap: 8px;
+}
+
+@media (max-height: 600px) {
+	.burgerConstructor {
+		margin-top: 32px;
+	}
+
+	.burger {
+		margin-top: 104px;
+	}
+
+	.footer {
+		position: absolute;
+		right: 0;
+	}
 }

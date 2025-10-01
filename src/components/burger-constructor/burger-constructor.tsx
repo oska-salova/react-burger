@@ -19,7 +19,7 @@ function BurgerConstructor(props: BurgerConstructorProps) {
 
 	const updateCustomIngredientsTopPosition = () => {
 		if (ingredientsRef?.current) {
-			const ingredientsBounds = ingredientsRef.current.getBoundingClientRect() ?? 0;
+			const ingredientsBounds = ingredientsRef.current.getBoundingClientRect();
 			ingredientsRef.current.style.setProperty('--top', `${ingredientsBounds.top}px`);
 		}
 	};
@@ -34,7 +34,7 @@ function BurgerConstructor(props: BurgerConstructorProps) {
 	}, []);
 
 	return (
-		<section className={`${styles.burgerConstructor} mt-25`}>
+		<section className={`${styles.burgerConstructor}`}>
 			<section className={styles.burger}>
 				<ConstructorElement
 					type="top"

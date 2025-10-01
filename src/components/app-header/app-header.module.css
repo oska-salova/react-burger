@@ -4,6 +4,7 @@
 	background-color: var(--color-modal-bg);
 	display: flex;
 	justify-content: center;
+	position: fixed;
 }
 
 .content {
