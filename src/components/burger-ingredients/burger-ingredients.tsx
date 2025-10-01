@@ -1,4 +1,4 @@
-import { Fragment, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import styles from './burger-ingredients.module.css';
 import { Tab } from '@ya.praktikum/react-developer-burger-ui-components';
 import { BurgerIngredient, IngredientType, SupportedIngredientTypes } from '../../model/burger';
@@ -17,6 +17,15 @@ const TAB_NAME = {
 function BurgerIngredients(props: BurgerIngredientsProps) {
 	const [currentTab, setCurrentTab] = useState(SupportedIngredientTypes.bun.toString());
 	const ingredientsRef = useRef<HTMLDivElement | null>(null);
+	const tabContentRefs = useRef<Partial<Record<IngredientType, HTMLElement | null>>>({});
+	const [tabsVisibility, setTabsVisibility] = useState({
+		[SupportedIngredientTypes.bun]: false,
+		[SupportedIngredientTypes.sauce]: false,
+		[SupportedIngredientTypes.main]: false,
+	});
+	const handleTabContentRefs = (key: IngredientType) => (tabRef: HTMLDivElement) => {
+		tabContentRefs.current[key] = tabRef;
+	};
 
 	const ingredientGroups = useMemo(() => {
 		return Array.from(
@@ -55,20 +64,70 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 		};
 	}, []);
 
-	useLayoutEffect(() => {
-		if (ingredientsRef?.current) {
-			// TODO implement scroll to group header
-			ingredientsRef.current.scrollTo({
-				top:
-					currentTab === SupportedIngredientTypes.sauce
-						? 150
-						: currentTab === SupportedIngredientTypes.main
-							? 250
-							: 0,
-				behavior: 'smooth',
-			});
+	const handleTabClick = (tab: string) => {
+		setCurrentTab(tab);
+
+		if (tabContentRefs?.current) {
+			const tabContentElement = tabContentRefs.current[tab as IngredientType];
+			tabContentElement?.scrollIntoView({ behavior: 'smooth' });
 		}
-	}, [currentTab]);
+	};
+
+	useEffect(() => {
+		if (
+			!ingredientsRef.current ||
+			!tabContentRefs.current ||
+			Object.values(tabContentRefs.current).some(value => !value)
+		)
+			return;
+
+		const observer = new IntersectionObserver(
+			entries => {
+				const changedTabs: { [tab: string]: boolean } = entries.reduce<{
+					[tab: string]: boolean;
+				}>((cur, entry) => {
+					const tab = Object.keys(tabContentRefs.current).find(
+						key => tabContentRefs.current[key as IngredientType] === entry.target,
+					);
+					return { ...cur, [tab as IngredientType]: entry.isIntersecting };
+				}, {});
+
+				setTabsVisibility(tabsVisibility => {
+					return { ...tabsVisibility, ...changedTabs };
+				});
+
+				const newVisibleEntry = entries.find(entry => entry.isIntersecting);
+				let newVisibleTab;
+				if (newVisibleEntry) {
+					newVisibleTab = Object.keys(tabContentRefs.current).find(
+						key =>
+							tabContentRefs.current[key as IngredientType] ===
+							newVisibleEntry?.target,
+					);
+				} else {
+					const newHiddenTabs = entries.map(entry =>
+						Object.keys(tabContentRefs.current).find(
+							key => tabContentRefs.current[key as IngredientType] === entry.target,
+						),
+					);
+					newVisibleTab = Object.keys(tabsVisibility).find(
+						tab =>
+							tabsVisibility[tab as IngredientType] && !newHiddenTabs.includes(tab),
+					);
+				}
+				newVisibleTab && setCurrentTab(newVisibleTab);
+			},
+			{ threshold: 0, root: ingredientsRef.current },
+		);
+
+		Object.values(tabContentRefs.current).forEach(value => {
+			observer.observe(value as Element);
+		});
+
+		return () => {
+			observer.disconnect();
+		};
+	}, [tabContentRefs]);
 
 	return (
 		<section className={`${styles.burgerIngredients} mt-10`}>
@@ -79,7 +138,7 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 						<Tab
 							value={type}
 							active={currentTab === type}
-							onClick={setCurrentTab}
+							onClick={handleTabClick}
 							key={index}
 						>
 							{TAB_NAME[type]}
@@ -89,7 +148,7 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 			</div>
 			<div className={styles.ingredients} ref={ingredientsRef}>
 				{ingredientGroups.map(([key, ingredients]) => (
-					<Fragment key={key}>
+					<div key={key} ref={handleTabContentRefs(key)}>
 						<p
 							className={`${styles.ingredientsGroupCaption} text text_type_main-medium mb-5`}
 						>
@@ -102,7 +161,7 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 								</li>
 							))}
 						</ul>
-					</Fragment>
+					</div>
 				))}
 			</div>
 		</section>
