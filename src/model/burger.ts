@@ -1,15 +1,13 @@
-export enum SupportedIngredientTypes {
+export enum IngredientType {
 	bun = 'bun',
 	sauce = 'sauce',
 	main = 'main',
 }
 
-export type IngredientType = `${SupportedIngredientTypes}`;
-
 export interface BurgerIngredient {
 	_id: string;
 	name: string;
-	type: IngredientType;
+	type: keyof typeof IngredientType;
 	proteins: number;
 	fat: number;
 	carbohydrates: number;

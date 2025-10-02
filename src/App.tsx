@@ -1,11 +1,11 @@
 import AppHeader from './components/app-header/app-header';
 import BurgerConstructor from './components/burger-constructor/burger-constructor';
 import BurgerIngredients from './components/burger-ingredients/burger-ingredients';
-import { BurgerIngredient, SupportedIngredientTypes } from './model/burger';
+import { BurgerIngredient, IngredientType } from './model/burger';
 import { ingredients } from './utils/data';
 
 const staticBun = ingredients.find(
-	ingredient => ingredient.type === SupportedIngredientTypes.bun,
+	ingredient => ingredient.type === IngredientType.bun,
 ) as BurgerIngredient;
 const selectableIngredients = generateSelectableIngredients();
 
@@ -20,7 +20,6 @@ function App() {
 						<BurgerConstructor
 							bun={staticBun}
 							customIngredients={selectableIngredients}
-							price={0}
 						/>
 					)}
 				</div>
@@ -32,5 +31,5 @@ function App() {
 export default App;
 
 function generateSelectableIngredients(): BurgerIngredient[] {
-	return ingredients.filter(ingredient => ingredient.type !== SupportedIngredientTypes.bun);
+	return ingredients.filter(ingredient => ingredient.type !== IngredientType.bun);
 }

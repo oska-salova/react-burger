@@ -1,51 +1,53 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import styles from './burger-ingredients.module.css';
 import { Tab } from '@ya.praktikum/react-developer-burger-ui-components';
-import { BurgerIngredient, IngredientType, SupportedIngredientTypes } from '../../model/burger';
+import { BurgerIngredient, IngredientType } from '../../model/burger';
 import BurgerIngredientItem from './burger-ingredient-item/burger-ingredient-item';
 
 interface BurgerIngredientsProps {
 	ingredients: BurgerIngredient[];
 }
 
-const TAB_NAME = {
-	[SupportedIngredientTypes.bun]: 'Булки',
-	[SupportedIngredientTypes.sauce]: 'Соусы',
-	[SupportedIngredientTypes.main]: 'Начинки',
+const GROUP_NAMES: Record<IngredientType, string> = {
+	[IngredientType.bun]: 'Булки',
+	[IngredientType.sauce]: 'Соусы',
+	[IngredientType.main]: 'Начинки',
 };
 
 function BurgerIngredients(props: BurgerIngredientsProps) {
-	const [currentTab, setCurrentTab] = useState(SupportedIngredientTypes.bun.toString());
+	const [currentTab, setCurrentTab] = useState(IngredientType.bun.toString());
 	const ingredientsRef = useRef<HTMLDivElement | null>(null);
-	const tabContentRefs = useRef<Partial<Record<IngredientType, HTMLElement | null>>>({});
-	const [tabsVisibility, setTabsVisibility] = useState({
-		[SupportedIngredientTypes.bun]: false,
-		[SupportedIngredientTypes.sauce]: false,
-		[SupportedIngredientTypes.main]: false,
+	const tabContentRefs = useRef<Record<IngredientType, HTMLElement | null>>({
+		[IngredientType.bun]: null,
+		[IngredientType.sauce]: null,
+		[IngredientType.main]: null,
+	});
+	const [tabsContentVisibility, setTabsContentVisibility] = useState({
+		[IngredientType.bun]: false,
+		[IngredientType.sauce]: false,
+		[IngredientType.main]: false,
 	});
 	const handleTabContentRefs = (key: IngredientType) => (tabRef: HTMLDivElement) => {
 		tabContentRefs.current[key] = tabRef;
 	};
 
-	const ingredientGroups = useMemo(() => {
-		return Array.from(
-			props.ingredients
-				.sort((a, b) => {
-					const order = Object.keys(SupportedIngredientTypes);
-					const indexA = order.indexOf(a.type);
-					const indexB = order.indexOf(b.type);
+	const ingredientGroups = useMemo<Record<IngredientType, BurgerIngredient[]>>(() => {
+		return props.ingredients
+			.sort((a, b) => {
+				const order = Object.keys(IngredientType);
+				const indexA = order.indexOf(a.type);
+				const indexB = order.indexOf(b.type);
 
-					return indexA - indexB;
-				})
-				.reduce((groups, ingredient) => {
-					const groupKey = ingredient.type;
-					if (!groups.get(groupKey)) {
-						groups.set(groupKey, []);
-					}
-					groups.get(groupKey)?.push(ingredient);
+				return indexA - indexB;
+			})
+			.reduce(
+				(groups, ingredient) => {
+					groups[ingredient.type] ??= [];
+					groups[ingredient.type].push(ingredient);
 					return groups;
-				}, new Map<IngredientType, BurgerIngredient[]>()),
-		);
+				},
+				{} as { [key in IngredientType]: BurgerIngredient[] },
+			);
 	}, [props.ingredients]);
 
 	const updateIngredientsTopPosition = () => {
@@ -83,16 +85,17 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 
 		const observer = new IntersectionObserver(
 			entries => {
-				const changedTabs: { [tab: string]: boolean } = entries.reduce<{
-					[tab: string]: boolean;
-				}>((cur, entry) => {
-					const tab = Object.keys(tabContentRefs.current).find(
-						key => tabContentRefs.current[key as IngredientType] === entry.target,
-					);
-					return { ...cur, [tab as IngredientType]: entry.isIntersecting };
-				}, {});
+				const changedTabs = entries.reduce(
+					(cur, entry) => {
+						const tab = Object.keys(tabContentRefs.current).find(
+							key => tabContentRefs.current[key as IngredientType] === entry.target,
+						);
+						return { ...cur, [tab as IngredientType]: entry.isIntersecting };
+					},
+					{} as Record<IngredientType, boolean>,
+				);
 
-				setTabsVisibility(tabsVisibility => {
+				setTabsContentVisibility(tabsVisibility => {
 					return { ...tabsVisibility, ...changedTabs };
 				});
 
@@ -110,9 +113,10 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 							key => tabContentRefs.current[key as IngredientType] === entry.target,
 						),
 					);
-					newVisibleTab = Object.keys(tabsVisibility).find(
+					newVisibleTab = Object.keys(tabsContentVisibility).find(
 						tab =>
-							tabsVisibility[tab as IngredientType] && !newHiddenTabs.includes(tab),
+							tabsContentVisibility[tab as IngredientType] &&
+							!newHiddenTabs.includes(tab),
 					);
 				}
 				newVisibleTab && setCurrentTab(newVisibleTab);
@@ -127,13 +131,13 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 		return () => {
 			observer.disconnect();
 		};
-	}, [tabContentRefs]);
+	}, [ingredientsRef, tabContentRefs]);
 
 	return (
 		<section className={`${styles.burgerIngredients} mt-10`}>
 			<h1 className={`${styles.header} text text_type_main-large mb-5`}>Соберите бургер</h1>
 			<div className={`${styles.tabs} mb-10`}>
-				{ingredientGroups.map(([type], index) => {
+				{Object.keys(ingredientGroups).map((type, index) => {
 					return (
 						<Tab
 							value={type}
@@ -141,23 +145,23 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 							onClick={handleTabClick}
 							key={index}
 						>
-							{TAB_NAME[type]}
+							{GROUP_NAMES[type as IngredientType]}
 						</Tab>
 					);
 				})}
 			</div>
 			<div className={styles.ingredients} ref={ingredientsRef}>
-				{ingredientGroups.map(([key, ingredients]) => (
-					<div key={key} ref={handleTabContentRefs(key)}>
+				{Object.entries(ingredientGroups).map(([type, ingredients]) => (
+					<div key={type} ref={handleTabContentRefs(type as IngredientType)}>
 						<p
 							className={`${styles.ingredientsGroupCaption} text text_type_main-medium mb-5`}
 						>
-							{TAB_NAME[key]}
+							{GROUP_NAMES[type as IngredientType]}
 						</p>
 						<ul className={`${styles.ingredientsGroup}`}>
 							{ingredients.map(ingredient => (
 								<li key={ingredient._id} className={styles.ingredient}>
-									<BurgerIngredientItem ingredient={ingredient} />
+									<BurgerIngredientItem ingredient={ingredient} count={1} />
 								</li>
 							))}
 						</ul>
