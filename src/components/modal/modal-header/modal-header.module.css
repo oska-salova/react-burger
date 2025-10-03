@@ -1,0 +1,16 @@
+.header {
+	display: flex;
+	justify-content: space-between;
+}
+
+.caption {
+	flex: 1 1 auto;
+}
+
+.close {
+	background: none;
+	border: none;
+	cursor: pointer;
+	margin: 0;
+	padding: 0;
+}
