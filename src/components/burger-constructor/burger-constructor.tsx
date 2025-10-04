@@ -8,15 +8,20 @@ import styles from './burger-constructor.module.css';
 import { BurgerIngredient } from '../../model/burger';
 import { useLayoutEffect, useRef } from 'react';
 import { useModal } from '../../hooks/useModal';
+import OrderDetails from '../order/order-details/order-details';
+import { Order, OrderStatus } from '../../model/order';
 
 interface BurgerConstructorProps {
 	bun: BurgerIngredient;
 	customIngredients: BurgerIngredient[];
 }
 
+const TEST_ORDER: Order = { id: '034536', status: OrderStatus.done };
+
 function BurgerConstructor(props: BurgerConstructorProps) {
 	const customIngredientsRef = useRef<HTMLUListElement | null>(null);
-	const [isModalOpen, modal, openModal] = useModal();
+	const orderDetails = <OrderDetails order={TEST_ORDER} />;
+	const [isModalOpen, modal, openModal] = useModal('', orderDetails);
 
 	const updateCustomIngredientsTopPosition = () => {
 		if (customIngredientsRef?.current) {

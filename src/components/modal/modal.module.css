@@ -20,7 +20,7 @@
 	margin-inline: 0;
 }
 
-@media (max-width: 576px) {
+@media (max-width: 576px), (max-height: 576px) {
 	.modal {
 		width: 100vw;
 		height: 100vh;
@@ -38,7 +38,7 @@
 
 @media (max-height: 576px) {
 	.body {
-		max-height: 300px;
+		max-height: 80vh;
 		overflow-y: auto;
 	}
 }
