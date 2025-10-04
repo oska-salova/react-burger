@@ -9,8 +9,8 @@ const closeKeys = ['Escape'];
 
 interface ModalPropsType {
 	children: ReactNode;
+	onClose: () => void;
 	header?: string;
-	onClose?: () => void;
 }
 
 const Modal: FC<ModalPropsType> = ({ children, header, onClose }) => {
@@ -34,7 +34,7 @@ const Modal: FC<ModalPropsType> = ({ children, header, onClose }) => {
 				<ModalHeader header={header} onClose={onClose} />
 				<div className={styles.body}>{children}</div>
 			</div>
-			<ModalOverlay />,
+			<ModalOverlay onClick={onClose} />,
 		</>,
 		modalRoot,
 	);
