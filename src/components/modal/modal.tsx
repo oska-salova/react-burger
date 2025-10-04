@@ -32,7 +32,7 @@ const Modal: FC<ModalPropsType> = ({ children, header, onClose }) => {
 		<>
 			<div className={styles.modal}>
 				<ModalHeader header={header} onClose={onClose} />
-				{children}
+				<div className={styles.body}>{children}</div>
 			</div>
 			<ModalOverlay />,
 		</>,

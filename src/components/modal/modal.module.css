@@ -4,9 +4,9 @@
 	top: 50%;
 	transform: translate(-50%, -50%);
 	width: 720px;
-	height: 718px;
-	max-width: 100vw;
-	max-height: 100vh;
+	height: fit-content;
+	max-width: calc(100vw - 80px);
+	max-height: calc(100vw - 80px);
 	background-color: var(--color-modal-bg);
 	border-radius: 40px;
 	z-index: 1;
@@ -14,4 +14,31 @@
 	flex-direction: column;
 	gap: 0;
 	padding: 40px;
+}
+
+.body {
+	margin-inline: 0;
+}
+
+@media (max-width: 576px) {
+	.modal {
+		width: 100vw;
+		height: 100vh;
+		max-width: 100vw;
+		max-height: 100vh;
+		padding: 0;
+		background-color: var(--color-bg);
+		border-radius: 0;
+	}
+
+	.body {
+		margin-inline: 16px;
+	}
+}
+
+@media (max-height: 576px) {
+	.body {
+		max-height: 300px;
+		overflow-y: auto;
+	}
 }

@@ -1,16 +1,25 @@
 .header {
 	display: flex;
 	justify-content: space-between;
-}
-
-.caption {
-	flex: 1 1 auto;
+	align-items: center;
+	gap: 8px;
 }
 
 .close {
 	background: none;
 	border: none;
 	cursor: pointer;
-	margin: 0;
+	margin: 4px;
 	padding: 0;
+}
+
+@media (max-width: 576px) {
+	.header {
+		height: 56px;
+		margin-inline: 16px;
+	}
+
+	.caption {
+		visibility: hidden;
+	}
 }

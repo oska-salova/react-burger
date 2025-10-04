@@ -10,7 +10,7 @@ interface ModalHeaderPropsType {
 const ModalHeader: FC<ModalHeaderPropsType> = ({ header, onClose }) => {
 	return (
 		<div className={styles.header}>
-			<p className="text text_type_main-large">{header}</p>
+			<p className={`${styles.caption} text text_type_main-large`}>{header}</p>
 			<button className={styles.close}>
 				<CloseIcon type="primary" onClick={onClose} />
 			</button>
