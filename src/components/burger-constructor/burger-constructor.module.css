@@ -1,4 +1,5 @@
 .burgerConstructor {
+	position: relative;
 	width: 50%;
 	min-width: 620px;
 	display: flex;
