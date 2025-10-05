@@ -1,0 +1,16 @@
+.item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	border-radius: 40px;
+}
+
+.caption {
+	display: block;
+}
+
+@media (max-width: 992px) {
+	.caption {
+		display: none;
+	}
+}
