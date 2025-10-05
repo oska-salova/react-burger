@@ -44,6 +44,10 @@ function BurgerConstructor(props: BurgerConstructorProps) {
 		};
 	}, []);
 
+	const handleOrderButtonClick = () => {
+		openModal();
+	};
+
 	return (
 		<>
 			<section className={`${styles.burgerConstructor}`}>
@@ -51,7 +55,7 @@ function BurgerConstructor(props: BurgerConstructorProps) {
 					<ConstructorElement
 						type="top"
 						isLocked={true}
-						text={props.bun.name}
+						text={`${props.bun.name} (верх)`}
 						price={props.bun.price}
 						thumbnail={props.bun.image_mobile}
 						extraClass="mr-4"
@@ -73,7 +77,7 @@ function BurgerConstructor(props: BurgerConstructorProps) {
 					<ConstructorElement
 						type="bottom"
 						isLocked={true}
-						text={props.bun.name}
+						text={`${props.bun.name} (низ)`}
 						price={props.bun.price}
 						thumbnail={props.bun.image_mobile}
 						extraClass="mr-4"
@@ -84,7 +88,12 @@ function BurgerConstructor(props: BurgerConstructorProps) {
 						<p className="text text_type_digits-default">{burgerPrice}</p>
 						<CurrencyIcon type="primary" />
 					</div>
-					<Button htmlType="button" type="primary" size="large" onClick={openModal}>
+					<Button
+						htmlType="button"
+						type="primary"
+						size="large"
+						onClick={handleOrderButtonClick}
+					>
 						Оформить заказ
 					</Button>
 				</section>

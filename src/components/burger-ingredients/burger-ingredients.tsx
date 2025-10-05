@@ -3,6 +3,8 @@ import styles from './burger-ingredients.module.css';
 import { Tab } from '@ya.praktikum/react-developer-burger-ui-components';
 import { BurgerIngredient, IngredientType } from '../../model/burger';
 import BurgerIngredientItem from './burger-ingredient-item/burger-ingredient-item';
+import IngredientDetails from './ingredient-details/ingredient-details';
+import { useModal } from '../../hooks/useModal';
 
 interface BurgerIngredientsProps {
 	ingredients: BurgerIngredient[];
@@ -75,6 +77,11 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 		}
 	};
 
+	const [isModalOpen, modal, openModal] = useModal('Детали ингредиента');
+	const handleIngredientClick = (ingredient: BurgerIngredient) => {
+		openModal(<IngredientDetails ingredient={ingredient} />);
+	};
+
 	useEffect(() => {
 		if (
 			!ingredientsRef.current ||
@@ -134,41 +141,50 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 	}, [ingredientsRef, tabContentRefs]);
 
 	return (
-		<section className={`${styles.burgerIngredients} mt-10`}>
-			<h1 className={`${styles.header} text text_type_main-large mb-5`}>Соберите бургер</h1>
-			<div className={`${styles.tabs} mb-10`}>
-				{Object.keys(ingredientGroups).map((type, index) => {
-					return (
-						<Tab
-							value={type}
-							active={currentTab === type}
-							onClick={handleTabClick}
-							key={index}
-						>
-							{GROUP_NAMES[type as IngredientType]}
-						</Tab>
-					);
-				})}
-			</div>
-			<div className={styles.ingredients} ref={ingredientsRef}>
-				{Object.entries(ingredientGroups).map(([type, ingredients]) => (
-					<div key={type} ref={handleTabContentRefs(type as IngredientType)}>
-						<p
-							className={`${styles.ingredientsGroupCaption} text text_type_main-medium mb-5`}
-						>
-							{GROUP_NAMES[type as IngredientType]}
-						</p>
-						<ul className={`${styles.ingredientsGroup}`}>
-							{ingredients.map(ingredient => (
-								<li key={ingredient._id} className={styles.ingredient}>
-									<BurgerIngredientItem ingredient={ingredient} count={1} />
-								</li>
-							))}
-						</ul>
-					</div>
-				))}
-			</div>
-		</section>
+		<>
+			<section className={`${styles.burgerIngredients} mt-10`}>
+				<h1 className={`${styles.header} text text_type_main-large mb-5`}>
+					Соберите бургер
+				</h1>
+				<div className={`${styles.tabs} mb-10`}>
+					{Object.keys(ingredientGroups).map((type, index) => {
+						return (
+							<Tab
+								value={type}
+								active={currentTab === type}
+								onClick={handleTabClick}
+								key={index}
+							>
+								{GROUP_NAMES[type as IngredientType]}
+							</Tab>
+						);
+					})}
+				</div>
+				<div className={styles.ingredients} ref={ingredientsRef}>
+					{Object.entries(ingredientGroups).map(([type, ingredients]) => (
+						<div key={type} ref={handleTabContentRefs(type as IngredientType)}>
+							<p
+								className={`${styles.ingredientsGroupCaption} text text_type_main-medium mb-5`}
+							>
+								{GROUP_NAMES[type as IngredientType]}
+							</p>
+							<ul className={`${styles.ingredientsGroup}`}>
+								{ingredients.map(ingredient => (
+									<li key={ingredient._id} className={styles.ingredient}>
+										<BurgerIngredientItem
+											ingredient={ingredient}
+											count={1}
+											onClick={handleIngredientClick}
+										/>
+									</li>
+								))}
+							</ul>
+						</div>
+					))}
+				</div>
+			</section>
+			{isModalOpen && modal}
+		</>
 	);
 }
 

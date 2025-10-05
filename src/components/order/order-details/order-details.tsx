@@ -19,13 +19,11 @@ const OrderDetails: FC<OrderDetailsProps> = ({ order }) => {
 	);
 
 	return (
-		<>
-			<section className={styles.details}>
-				<p className={`${styles.orderId} text text_type_digits-large`}>{order.id}</p>
-				<p className="text text_type_main-small">идентификатор заказа</p>
-				{getOrderStatus(order.status)}
-			</section>
-		</>
+		<section className={styles.details}>
+			<p className={`${styles.orderId} text text_type_digits-large`}>{order.id}</p>
+			<p className="text text_type_main-small">идентификатор заказа</p>
+			{getOrderStatus(order.status)}
+		</section>
 	);
 };
 

@@ -16,11 +16,7 @@ function App() {
 
 	if (error || !responseData?.success) {
 		const errorMessage = error ? error.message : 'No ingredients found';
-		return (
-			<p className="text text_type_main-default m-2" style={{ color: 'red' }}>
-				{errorMessage}
-			</p>
-		);
+		return <p className="text text_type_main-default m-2 text_color_error">{errorMessage}</p>;
 	}
 
 	const ingredients = responseData.data as BurgerIngredient[];
