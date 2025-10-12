@@ -1,34 +1,18 @@
-import {
-	Button,
-	ConstructorElement,
-	CurrencyIcon,
-	DragIcon,
-} from '@ya.praktikum/react-developer-burger-ui-components';
+import { Button, CurrencyIcon } from '@ya.praktikum/react-developer-burger-ui-components';
 import styles from './burger-constructor.module.css';
-import { BurgerIngredient, IngredientType } from '../../model/burger';
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useMemo, useRef } from 'react';
 import { useModal } from '../../hooks/useModal';
 import OrderDetails from '../order/order-details/order-details';
 import { useAppDispatch, useAppSelector } from '../../services/store';
-import { BurgerSelectedIngredientsActionTypes } from '../../services/actions/burger/constructor';
 import { registerOrder } from '../../services/thunks/order';
+import ConstructorBun from './constructor-bun/constructor-bun';
+import ConstructorFilling from './constructor-filling/constructor-filling';
 
 function BurgerConstructor() {
 	const dispatch = useAppDispatch();
 	const ingredients = useAppSelector(state => state.ingredients.ingredients);
-	useEffect(() => {
-		dispatch({
-			type: BurgerSelectedIngredientsActionTypes.SET_BURGER_SELECTED_INGREDIENTS,
-			ingredients: ingredients ?? [],
-		});
-	}, [ingredients]);
-
-	const bun = ingredients.find(
-		ingredient => ingredient.type === IngredientType.bun,
-	) as BurgerIngredient;
-	const customIngredients = ingredients.filter(
-		ingredient => ingredient.type !== IngredientType.bun,
-	);
+	const bun = useAppSelector(state => state.selectedIngredients.bun);
+	const customIngredients = useAppSelector(state => state.selectedIngredients.ingredients);
 
 	const customIngredientsRef = useRef<HTMLUListElement | null>(null);
 	const [isModalOpen, modal, openModal] = useModal('', <OrderDetails />);
@@ -40,10 +24,12 @@ function BurgerConstructor() {
 		}
 	};
 
-	const burgerPrice = customIngredients.reduce(
-		(price, ingredient) => price + ingredient.price,
-		0,
-	);
+	const burgerPrice = useMemo<number>(() => {
+		return (
+			customIngredients.reduce((price, ingredient) => price + ingredient.price, 0) +
+			(bun ? bun.price * 2 : 0)
+		);
+	}, [customIngredients, bun]);
 
 	useLayoutEffect(() => {
 		updateCustomIngredientsTopPosition();
@@ -55,69 +41,56 @@ function BurgerConstructor() {
 	}, [ingredients]);
 
 	const handleOrderButtonClick = () => {
-		dispatch(
-			registerOrder([
-				bun._id,
-				...customIngredients.map(ingredient => ingredient._id),
-				bun._id,
-			]),
-		);
+		if (bun) {
+			dispatch(
+				registerOrder([
+					bun._id,
+					...customIngredients.map(ingredient => ingredient._id),
+					bun._id,
+				]),
+			);
+		}
 		openModal();
 	};
 
-	if (!bun) {
+	if (!ingredients) {
 		return null;
 	}
 
+	const customIngredientItems = customIngredients.length ? customIngredients : [undefined];
 	return (
 		<>
 			<section className={`${styles.burgerConstructor}`}>
 				<section className={styles.burger}>
-					<ConstructorElement
-						type="top"
-						isLocked={true}
-						text={`${bun.name} (верх)`}
-						price={bun.price}
-						thumbnail={bun.image_mobile}
-						extraClass="mr-4"
-					/>
+					<ConstructorBun type="top" />
 					<ul className={styles.customIngredients} ref={customIngredientsRef}>
-						{customIngredients.map(ingredient => (
-							<li key={ingredient._id} className={styles.ingredient}>
-								<div className="m-2">
-									<DragIcon type="primary" />
-								</div>
-								<ConstructorElement
-									text={ingredient.name}
-									price={ingredient.price}
-									thumbnail={ingredient.image_mobile}
-								/>
+						{customIngredientItems.map(ingredient => (
+							<li
+								key={ingredient?.uuid ?? 'empty-filling'}
+								className={styles.ingredient}
+							>
+								<ConstructorFilling ingredient={ingredient} />
 							</li>
 						))}
 					</ul>
-					<ConstructorElement
-						type="bottom"
-						isLocked={true}
-						text={`${bun.name} (низ)`}
-						price={bun.price}
-						thumbnail={bun.image_mobile}
-						extraClass="mr-4"
-					/>
+					<ConstructorBun type="bottom" />
 				</section>
-				<section className={`${styles.footer} mr-4`}>
-					<div className={`${styles.price} mt-1 mb-1`}>
-						<p className="text text_type_digits-default">{burgerPrice}</p>
-						<CurrencyIcon type="primary" />
-					</div>
-					<Button
-						htmlType="button"
-						type="primary"
-						size="large"
-						onClick={handleOrderButtonClick}
-					>
-						Оформить заказ
-					</Button>
-				</section>
+				{bun && (
+					<section className={`${styles.footer} mr-4`}>
+						<div className={`${styles.price} mt-1 mb-1`}>
+							<p className="text text_type_digits-default">{burgerPrice}</p>
+							<CurrencyIcon type="primary" />
+						</div>
+						<Button
+							htmlType="button"
+							type="primary"
+							size="large"
+							onClick={handleOrderButtonClick}
+						>
+							Оформить заказ
+						</Button>
+					</section>
+				)}
 			</section>
 			{isModalOpen && modal}
 		</>

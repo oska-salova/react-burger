@@ -18,3 +18,16 @@ export interface BurgerIngredient {
 	image_large: string;
 	__v: number;
 }
+
+export interface ConstructorIngredient extends BurgerIngredient {
+	uuid: string;
+}
+
+export interface DropIngredient {
+	id: string;
+}
+
+export enum IngredientDropType {
+	bun = 'bun',
+	filling = 'filling',
+}

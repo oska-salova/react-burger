@@ -1,14 +1,17 @@
-import { BurgerIngredient } from '../../../model/burger';
+import { BurgerIngredient, ConstructorIngredient } from '../../../model/burger';
 import {
 	BurgerSelectedIngredientsActionTypes,
 	type BurgerSelectedIngredientsActions,
 } from '../../actions/burger/constructor';
+import { v4 as uuidv4 } from 'uuid';
 
 type SelectedIngredientsState = {
-	ingredients: BurgerIngredient[];
+	bun: BurgerIngredient | null;
+	ingredients: ConstructorIngredient[];
 };
 
 const initialState: SelectedIngredientsState = {
+	bun: null,
 	ingredients: [],
 };
 
@@ -17,23 +20,23 @@ export function selectedIngredientsReducer(
 	action: BurgerSelectedIngredientsActions,
 ): SelectedIngredientsState {
 	switch (action.type) {
-		case BurgerSelectedIngredientsActionTypes.SET_BURGER_SELECTED_INGREDIENTS:
+		case BurgerSelectedIngredientsActionTypes.SET_BURGER_SELECTED_BUN:
 			return {
 				...state,
-				ingredients: action.ingredients,
+				bun: { ...action.bun },
 			};
 
-		case BurgerSelectedIngredientsActionTypes.ADD_BURGER_SELECTED_INGREDIENTS:
+		case BurgerSelectedIngredientsActionTypes.ADD_BURGER_SELECTED_INGREDIENT:
 			return {
 				...state,
-				ingredients: [...state.ingredients, action.ingredient],
+				ingredients: [{ ...action.ingredient, uuid: uuidv4() }, ...state.ingredients],
 			};
 
-		case BurgerSelectedIngredientsActionTypes.DELETE_BURGER_SELECTED_INGREDIENTS:
+		case BurgerSelectedIngredientsActionTypes.DELETE_BURGER_SELECTED_INGREDIENT:
 			return {
 				...state,
 				ingredients: state.ingredients.filter(
-					ingredient => ingredient._id !== action.ingredient._id,
+					ingredient => ingredient.uuid !== action.ingredient.uuid,
 				),
 			};
 

@@ -19,6 +19,8 @@ function BurgerIngredients() {
 	const dispatch = useAppDispatch();
 	const isLoading = useAppSelector(state => state.ingredients.loading);
 	const ingredients = useAppSelector(state => state.ingredients.ingredients);
+	const selectedIngredients = useAppSelector(state => state.selectedIngredients.ingredients);
+	const selectedBun = useAppSelector(state => state.selectedIngredients.bun);
 	const error = useAppSelector(state => state.ingredients.error);
 
 	useEffect(() => {
@@ -35,6 +37,15 @@ function BurgerIngredients() {
 	const handleTabContentRefs = (key: IngredientType) => (tabRef: HTMLDivElement) => {
 		tabContentRefs.current[key] = tabRef;
 	};
+
+	const selectedIngredientCounts = useMemo<Record<string, number>>(() => {
+		const source = selectedBun ? { [selectedBun._id]: 2 } : {};
+		return selectedIngredients.reduce((counts, ingredient) => {
+			counts[ingredient._id] ??= 0;
+			counts[ingredient._id] += 1;
+			return counts;
+		}, source);
+	}, [selectedIngredients, selectedBun]);
 
 	const ingredientGroups = useMemo<Record<IngredientType, BurgerIngredient[]>>(() => {
 		return ingredients
@@ -164,19 +175,12 @@ function BurgerIngredients() {
 							>
 								{GROUP_NAMES[type as IngredientType]}
 							</p>
-							<ul
-								className={`${styles.ingredientsGroup}`}
-								// onScroll={handleListScroll}
-							>
+							<ul className={`${styles.ingredientsGroup}`}>
 								{ingredients.map(ingredient => (
-									<li
-										key={ingredient._id}
-										className={styles.ingredient}
-										// onScroll={handleListScroll}
-									>
+									<li key={ingredient._id} className={styles.ingredient}>
 										<BurgerIngredientItem
 											ingredient={ingredient}
-											count={1}
+											count={selectedIngredientCounts[ingredient._id]}
 											onClick={handleIngredientClick}
 										/>
 									</li>
