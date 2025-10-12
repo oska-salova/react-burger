@@ -1,6 +1,6 @@
 import { Button, CurrencyIcon } from '@ya.praktikum/react-developer-burger-ui-components';
 import styles from './burger-constructor.module.css';
-import { useLayoutEffect, useMemo, useRef } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useModal } from '../../hooks/useModal';
 import OrderDetails from '../order/order-details/order-details';
 import { useAppDispatch, useAppSelector } from '../../services/store';
@@ -13,6 +13,7 @@ function BurgerConstructor() {
 	const ingredients = useAppSelector(state => state.ingredients.ingredients);
 	const bun = useAppSelector(state => state.selectedIngredients.bun);
 	const customIngredients = useAppSelector(state => state.selectedIngredients.ingredients);
+	const orderState = useAppSelector(state => state.order);
 
 	const customIngredientsRef = useRef<HTMLUListElement | null>(null);
 	const [isModalOpen, modal, openModal] = useModal('', <OrderDetails />);
@@ -50,8 +51,11 @@ function BurgerConstructor() {
 				]),
 			);
 		}
-		openModal();
 	};
+
+	useEffect(() => {
+		if (orderState.error || orderState.order) openModal();
+	}, [orderState]);
 
 	if (!ingredients) {
 		return null;
@@ -86,6 +90,7 @@ function BurgerConstructor() {
 							type="primary"
 							size="large"
 							onClick={handleOrderButtonClick}
+							disabled={orderState.registration}
 						>
 							Оформить заказ
 						</Button>

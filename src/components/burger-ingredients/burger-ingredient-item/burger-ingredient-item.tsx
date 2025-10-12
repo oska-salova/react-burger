@@ -8,6 +8,7 @@ import {
 import styles from './burger-ingredient-item.module.css';
 import { Counter, CurrencyIcon } from '@ya.praktikum/react-developer-burger-ui-components';
 import { useDrag } from 'react-dnd';
+import { useAppSelector } from '../../../services/store';
 
 interface BurgerIngredientItemProps {
 	ingredient: BurgerIngredient;
@@ -17,6 +18,8 @@ interface BurgerIngredientItemProps {
 
 const BurgerIngredientItem: FC<BurgerIngredientItemProps> = memo(
 	({ ingredient, count = 0, onClick }) => {
+		const isOrderRegistrationInProgress = useAppSelector(state => state.order.registration);
+
 		const handleIngredientClick = () => {
 			onClick(ingredient);
 		};
@@ -27,6 +30,9 @@ const BurgerIngredientItem: FC<BurgerIngredientItemProps> = memo(
 					? IngredientDropType.bun
 					: IngredientDropType.filling,
 			item: { id: ingredient._id } as DropIngredient,
+			canDrag() {
+				return !isOrderRegistrationInProgress;
+			},
 		});
 
 		return (
