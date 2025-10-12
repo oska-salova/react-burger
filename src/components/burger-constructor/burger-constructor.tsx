@@ -73,7 +73,7 @@ function BurgerConstructor() {
 		if (orderState.error || orderState.order) openModal();
 	}, [orderState]);
 
-	if (!ingredients) {
+	if (!ingredients.length) {
 		return null;
 	}
 
