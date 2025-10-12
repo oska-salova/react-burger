@@ -1,10 +1,9 @@
 import { ConstructorElement, DragIcon } from '@ya.praktikum/react-developer-burger-ui-components';
 import styles from './constructor-filling.module.css';
-import { useDrop } from 'react-dnd';
-import { useAppDispatch, useAppSelector } from '../../../services/store';
+import { useAppDispatch } from '../../../services/store';
 import { BurgerSelectedIngredientsActionTypes } from '../../../services/actions/burger/constructor';
 import { FC } from 'react';
-import { ConstructorIngredient, DropIngredient, IngredientDropType } from '../../../model/burger';
+import { ConstructorIngredient } from '../../../model/burger';
 
 interface ConstructorFillingProps {
 	ingredient?: ConstructorIngredient;
@@ -12,19 +11,6 @@ interface ConstructorFillingProps {
 
 const ConstructorFilling: FC<ConstructorFillingProps> = ({ ingredient }) => {
 	const dispatch = useAppDispatch();
-	const ingredients = useAppSelector(state => state.ingredients.ingredients);
-
-	const [, dropTarget] = useDrop({
-		accept: IngredientDropType.filling,
-		drop(item) {
-			dispatch({
-				type: BurgerSelectedIngredientsActionTypes.ADD_BURGER_SELECTED_INGREDIENT,
-				ingredient: ingredients.find(
-					ingredient => ingredient._id === (item as DropIngredient).id,
-				),
-			});
-		},
-	});
 
 	const handleClose = () => {
 		dispatch({
@@ -35,7 +21,7 @@ const ConstructorFilling: FC<ConstructorFillingProps> = ({ ingredient }) => {
 
 	const containerClass = `${styles.container} ${ingredient ? '' : `constructor-element ${styles.empty}`}`;
 	return (
-		<div className={containerClass} ref={dropTarget}>
+		<div className={containerClass}>
 			{ingredient ? (
 				<>
 					<div className="m-2">

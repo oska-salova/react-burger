@@ -7,6 +7,9 @@ import { useAppDispatch, useAppSelector } from '../../services/store';
 import { registerOrder } from '../../services/thunks/order';
 import ConstructorBun from './constructor-bun/constructor-bun';
 import ConstructorFilling from './constructor-filling/constructor-filling';
+import { useDrop } from 'react-dnd';
+import { DropIngredient, IngredientDropType } from '../../model/burger';
+import { BurgerSelectedIngredientsActionTypes } from '../../services/actions/burger/constructor';
 
 function BurgerConstructor() {
 	const dispatch = useAppDispatch();
@@ -18,8 +21,21 @@ function BurgerConstructor() {
 	const customIngredientsRef = useRef<HTMLUListElement | null>(null);
 	const [isModalOpen, modal, openModal] = useModal('', <OrderDetails />);
 
+	const [, dropRef] = useDrop({
+		accept: IngredientDropType.filling,
+		drop(item) {
+			dispatch({
+				type: BurgerSelectedIngredientsActionTypes.ADD_BURGER_SELECTED_INGREDIENT,
+				ingredient: ingredients.find(
+					ingredient => ingredient._id === (item as DropIngredient).id,
+				),
+			});
+		},
+	});
+	dropRef(customIngredientsRef);
+
 	const updateCustomIngredientsTopPosition = () => {
-		if (customIngredientsRef?.current) {
+		if (customIngredientsRef.current) {
 			const ingredientsBounds = customIngredientsRef.current.getBoundingClientRect();
 			customIngredientsRef.current.style.setProperty('--top', `${ingredientsBounds.top}px`);
 		}
