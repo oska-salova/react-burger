@@ -32,11 +32,6 @@ function BurgerIngredients() {
 		[IngredientType.sauce]: null,
 		[IngredientType.main]: null,
 	});
-	const [tabsContentVisibility, setTabsContentVisibility] = useState({
-		[IngredientType.bun]: false,
-		[IngredientType.sauce]: false,
-		[IngredientType.main]: false,
-	});
 	const handleTabContentRefs = (key: IngredientType) => (tabRef: HTMLDivElement) => {
 		tabContentRefs.current[key] = tabRef;
 	};
@@ -85,6 +80,33 @@ function BurgerIngredients() {
 		}
 	};
 
+	const handleIngredientsScroll = () => {
+		if (
+			!ingredientsRef.current ||
+			!tabContentRefs.current ||
+			Object.values(tabContentRefs.current).some(value => !value)
+		)
+			return;
+
+		const ingredientContainerTop = ingredientsRef.current.getBoundingClientRect().top;
+		const contentHeaderTops = Object.values(tabContentRefs.current).map(
+			value => value?.getBoundingClientRect().top ?? Infinity,
+		);
+
+		let minIndex = 0;
+		let curMinDistance = Math.abs(ingredientContainerTop - contentHeaderTops[minIndex]);
+		contentHeaderTops.forEach((contentHeaderTop: number, index: number) => {
+			const distance = Math.abs(ingredientContainerTop - contentHeaderTop);
+			if (distance < curMinDistance) {
+				curMinDistance = distance;
+				minIndex = index;
+			}
+		});
+
+		const tab = Object.keys(tabContentRefs.current)[minIndex];
+		setCurrentTab(tab);
+	};
+
 	const [isModalOpen, modal, openModal] = useModal('Детали ингредиента');
 	const handleIngredientClick = (ingredient: BurgerIngredient) => {
 		dispatch({
@@ -101,64 +123,6 @@ function BurgerIngredients() {
 			});
 		}
 	}, [isModalOpen]);
-
-	useEffect(() => {
-		if (
-			!ingredientsRef.current ||
-			!tabContentRefs.current ||
-			Object.values(tabContentRefs.current).some(value => !value)
-		)
-			return;
-
-		const observer = new IntersectionObserver(
-			entries => {
-				const changedTabs = entries.reduce(
-					(cur, entry) => {
-						const tab = Object.keys(tabContentRefs.current).find(
-							key => tabContentRefs.current[key as IngredientType] === entry.target,
-						);
-						return { ...cur, [tab as IngredientType]: entry.isIntersecting };
-					},
-					{} as Record<IngredientType, boolean>,
-				);
-
-				setTabsContentVisibility(tabsVisibility => {
-					return { ...tabsVisibility, ...changedTabs };
-				});
-
-				const newVisibleEntry = entries.find(entry => entry.isIntersecting);
-				let newVisibleTab;
-				if (newVisibleEntry) {
-					newVisibleTab = Object.keys(tabContentRefs.current).find(
-						key =>
-							tabContentRefs.current[key as IngredientType] ===
-							newVisibleEntry?.target,
-					);
-				} else {
-					const newHiddenTabs = entries.map(entry =>
-						Object.keys(tabContentRefs.current).find(
-							key => tabContentRefs.current[key as IngredientType] === entry.target,
-						),
-					);
-					newVisibleTab = Object.keys(tabsContentVisibility).find(
-						tab =>
-							tabsContentVisibility[tab as IngredientType] &&
-							!newHiddenTabs.includes(tab),
-					);
-				}
-				newVisibleTab && setCurrentTab(newVisibleTab);
-			},
-			{ threshold: 0, root: ingredientsRef.current },
-		);
-
-		Object.values(tabContentRefs.current).forEach(value => {
-			observer.observe(value as Element);
-		});
-
-		return () => {
-			observer.disconnect();
-		};
-	}, [ingredientsRef, tabContentRefs]);
 
 	if (isLoading) {
 		return <p className="text text_type_main-default m-2">Loading...</p>;
@@ -188,7 +152,11 @@ function BurgerIngredients() {
 						);
 					})}
 				</div>
-				<div className={styles.ingredients} ref={ingredientsRef}>
+				<div
+					className={styles.ingredients}
+					ref={ingredientsRef}
+					onScroll={handleIngredientsScroll}
+				>
 					{Object.entries(ingredientGroups).map(([type, ingredients]) => (
 						<div key={type} ref={handleTabContentRefs(type as IngredientType)}>
 							<p
@@ -196,9 +164,16 @@ function BurgerIngredients() {
 							>
 								{GROUP_NAMES[type as IngredientType]}
 							</p>
-							<ul className={`${styles.ingredientsGroup}`}>
+							<ul
+								className={`${styles.ingredientsGroup}`}
+								// onScroll={handleListScroll}
+							>
 								{ingredients.map(ingredient => (
-									<li key={ingredient._id} className={styles.ingredient}>
+									<li
+										key={ingredient._id}
+										className={styles.ingredient}
+										// onScroll={handleListScroll}
+									>
 										<BurgerIngredientItem
 											ingredient={ingredient}
 											count={1}
