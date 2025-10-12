@@ -5,10 +5,9 @@ import { BurgerIngredient, IngredientType } from '../../model/burger';
 import BurgerIngredientItem from './burger-ingredient-item/burger-ingredient-item';
 import IngredientDetails from './ingredient-details/ingredient-details';
 import { useModal } from '../../hooks/useModal';
-
-interface BurgerIngredientsProps {
-	ingredients: BurgerIngredient[];
-}
+import { getIngredients } from '../../services/thunks/burger/ingredients';
+import { useAppDispatch, useAppSelector } from '../../services/store';
+import { CurrentBurgerIngredientActionTypes } from '../../services/actions/burger/ingredient-details';
 
 const GROUP_NAMES: Record<IngredientType, string> = {
 	[IngredientType.bun]: 'Булки',
@@ -16,7 +15,16 @@ const GROUP_NAMES: Record<IngredientType, string> = {
 	[IngredientType.main]: 'Начинки',
 };
 
-function BurgerIngredients(props: BurgerIngredientsProps) {
+function BurgerIngredients() {
+	const dispatch = useAppDispatch();
+	const isLoading = useAppSelector(state => state.ingredients.loading);
+	const ingredients = useAppSelector(state => state.ingredients.ingredients);
+	const error = useAppSelector(state => state.ingredients.error);
+
+	useEffect(() => {
+		dispatch(getIngredients());
+	}, [dispatch]);
+
 	const [currentTab, setCurrentTab] = useState(IngredientType.bun.toString());
 	const ingredientsRef = useRef<HTMLDivElement | null>(null);
 	const tabContentRefs = useRef<Record<IngredientType, HTMLElement | null>>({
@@ -34,7 +42,7 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 	};
 
 	const ingredientGroups = useMemo<Record<IngredientType, BurgerIngredient[]>>(() => {
-		return props.ingredients
+		return ingredients
 			.sort((a, b) => {
 				const order = Object.keys(IngredientType);
 				const indexA = order.indexOf(a.type);
@@ -50,7 +58,7 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 				},
 				{} as { [key in IngredientType]: BurgerIngredient[] },
 			);
-	}, [props.ingredients]);
+	}, [ingredients]);
 
 	const updateIngredientsTopPosition = () => {
 		if (ingredientsRef?.current) {
@@ -66,7 +74,7 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 		return () => {
 			window.removeEventListener('resize', updateIngredientsTopPosition);
 		};
-	}, []);
+	}, [ingredients]);
 
 	const handleTabClick = (tab: string) => {
 		setCurrentTab(tab);
@@ -79,8 +87,20 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 
 	const [isModalOpen, modal, openModal] = useModal('Детали ингредиента');
 	const handleIngredientClick = (ingredient: BurgerIngredient) => {
-		openModal(<IngredientDetails ingredient={ingredient} />);
+		dispatch({
+			type: CurrentBurgerIngredientActionTypes.SET_CURRENT_BURGER_INGREDIENT,
+			ingredient: ingredient,
+		});
+		openModal(<IngredientDetails />);
 	};
+
+	useEffect(() => {
+		if (!isModalOpen) {
+			dispatch({
+				type: CurrentBurgerIngredientActionTypes.DELETE_CURRENT_BURGER_INGREDIENT,
+			});
+		}
+	}, [isModalOpen]);
 
 	useEffect(() => {
 		if (
@@ -139,6 +159,14 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 			observer.disconnect();
 		};
 	}, [ingredientsRef, tabContentRefs]);
+
+	if (isLoading) {
+		return <p className="text text_type_main-default m-2">Loading...</p>;
+	}
+
+	if (error) {
+		return <p className="text text_type_main-default m-2 text_color_error">{error}</p>;
+	}
 
 	return (
 		<>

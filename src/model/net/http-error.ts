@@ -9,3 +9,9 @@ class HTTPError extends Error {
 }
 
 export default HTTPError;
+
+export type ResponseError = HTTPError | Error | null;
+
+export function isAbortError(error: Error): boolean {
+	return error.name === 'AbortError';
+}

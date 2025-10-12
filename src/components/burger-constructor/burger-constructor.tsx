@@ -5,23 +5,33 @@ import {
 	DragIcon,
 } from '@ya.praktikum/react-developer-burger-ui-components';
 import styles from './burger-constructor.module.css';
-import { BurgerIngredient } from '../../model/burger';
-import { useLayoutEffect, useRef } from 'react';
+import { BurgerIngredient, IngredientType } from '../../model/burger';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { useModal } from '../../hooks/useModal';
 import OrderDetails from '../order/order-details/order-details';
-import { Order, OrderStatus } from '../../model/order';
+import { useAppDispatch, useAppSelector } from '../../services/store';
+import { BurgerSelectedIngredientsActionTypes } from '../../services/actions/burger/constructor';
+import { registerOrder } from '../../services/thunks/order';
 
-interface BurgerConstructorProps {
-	bun: BurgerIngredient;
-	customIngredients: BurgerIngredient[];
-}
+function BurgerConstructor() {
+	const dispatch = useAppDispatch();
+	const ingredients = useAppSelector(state => state.ingredients.ingredients);
+	useEffect(() => {
+		dispatch({
+			type: BurgerSelectedIngredientsActionTypes.SET_BURGER_SELECTED_INGREDIENTS,
+			ingredients: ingredients ?? [],
+		});
+	}, [ingredients]);
 
-const TEST_ORDER: Order = { id: '034536', status: OrderStatus.done };
+	const bun = ingredients.find(
+		ingredient => ingredient.type === IngredientType.bun,
+	) as BurgerIngredient;
+	const customIngredients = ingredients.filter(
+		ingredient => ingredient.type !== IngredientType.bun,
+	);
 
-function BurgerConstructor(props: BurgerConstructorProps) {
 	const customIngredientsRef = useRef<HTMLUListElement | null>(null);
-	const orderDetails = <OrderDetails order={TEST_ORDER} />;
-	const [isModalOpen, modal, openModal] = useModal('', orderDetails);
+	const [isModalOpen, modal, openModal] = useModal('', <OrderDetails />);
 
 	const updateCustomIngredientsTopPosition = () => {
 		if (customIngredientsRef?.current) {
@@ -30,7 +40,7 @@ function BurgerConstructor(props: BurgerConstructorProps) {
 		}
 	};
 
-	const burgerPrice = props.customIngredients.reduce(
+	const burgerPrice = customIngredients.reduce(
 		(price, ingredient) => price + ingredient.price,
 		0,
 	);
@@ -42,11 +52,22 @@ function BurgerConstructor(props: BurgerConstructorProps) {
 		return () => {
 			window.removeEventListener('resize', updateCustomIngredientsTopPosition);
 		};
-	}, []);
+	}, [ingredients]);
 
 	const handleOrderButtonClick = () => {
+		dispatch(
+			registerOrder([
+				bun._id,
+				...customIngredients.map(ingredient => ingredient._id),
+				bun._id,
+			]),
+		);
 		openModal();
 	};
+
+	if (!bun) {
+		return null;
+	}
 
 	return (
 		<>
@@ -55,13 +76,13 @@ function BurgerConstructor(props: BurgerConstructorProps) {
 					<ConstructorElement
 						type="top"
 						isLocked={true}
-						text={`${props.bun.name} (верх)`}
-						price={props.bun.price}
-						thumbnail={props.bun.image_mobile}
+						text={`${bun.name} (верх)`}
+						price={bun.price}
+						thumbnail={bun.image_mobile}
 						extraClass="mr-4"
 					/>
 					<ul className={styles.customIngredients} ref={customIngredientsRef}>
-						{props.customIngredients.map(ingredient => (
+						{customIngredients.map(ingredient => (
 							<li key={ingredient._id} className={styles.ingredient}>
 								<div className="m-2">
 									<DragIcon type="primary" />
@@ -77,9 +98,9 @@ function BurgerConstructor(props: BurgerConstructorProps) {
 					<ConstructorElement
 						type="bottom"
 						isLocked={true}
-						text={`${props.bun.name} (низ)`}
-						price={props.bun.price}
-						thumbnail={props.bun.image_mobile}
+						text={`${bun.name} (низ)`}
+						price={bun.price}
+						thumbnail={bun.image_mobile}
 						extraClass="mr-4"
 					/>
 				</section>
