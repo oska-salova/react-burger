@@ -1,6 +1,6 @@
 import { composeWithDevTools } from '@redux-devtools/extension';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
-import { applyMiddleware, combineReducers, createStore } from 'redux';
+import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
 import { thunk } from 'redux-thunk';
 import { ingredientsReducer } from './reducers/burger/ingredients';
 import { selectedIngredientsReducer } from './reducers/burger/constructor';
@@ -14,7 +14,11 @@ const rootReducer = combineReducers({
 	order: orderReducer,
 });
 
-export const store = createStore(rootReducer, {}, composeWithDevTools(applyMiddleware(thunk)));
+const enhancer =
+	process.env.NODE_ENV === 'development'
+		? composeWithDevTools(applyMiddleware(thunk))
+		: compose(applyMiddleware(thunk));
+export const store = createStore(rootReducer, {}, enhancer);
 
 export type RootState = ReturnType<(typeof store)['getState']>;
 export type AppDispatch = (typeof store)['dispatch'];
