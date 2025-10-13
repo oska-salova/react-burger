@@ -4,7 +4,7 @@ import { useDrop } from 'react-dnd';
 import { useAppDispatch, useAppSelector } from '../../../services/store';
 import { BurgerSelectedIngredientsActionTypes } from '../../../services/actions/burger/constructor';
 import { FC } from 'react';
-import { DropIngredient, IngredientDropType } from '../../../model/burger';
+import { DragIngredient, IngredientDropType } from '../../../model/burger';
 
 interface ConstructorBunProps {
 	type: 'top' | 'bottom';
@@ -19,14 +19,16 @@ const ConstructorBun: FC<ConstructorBunProps> = ({ type }) => {
 		collect: monitor => ({
 			isHover: monitor.isOver() && monitor.canDrop(),
 		}),
-		drop(item) {
+		drop(dragItem) {
 			dispatch({
 				type: BurgerSelectedIngredientsActionTypes.SET_BURGER_SELECTED_BUN,
-				bun: ingredients.find(ingredient => ingredient._id === (item as DropIngredient).id),
+				bun: ingredients.find(
+					ingredient => ingredient._id === (dragItem as DragIngredient).id,
+				),
 			});
 		},
 		canDrop(item) {
-			return (item as DropIngredient).id !== selectedBun?._id;
+			return (item as DragIngredient).id !== selectedBun?._id;
 		},
 	});
 

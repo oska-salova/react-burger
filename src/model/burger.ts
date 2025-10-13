@@ -23,7 +23,7 @@ export interface ConstructorIngredient extends BurgerIngredient {
 	uuid: string;
 }
 
-export interface DropIngredient {
+export interface DragIngredient {
 	id: string;
 }
 

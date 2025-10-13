@@ -40,6 +40,15 @@ export function selectedIngredientsReducer(
 				),
 			};
 
+		case BurgerSelectedIngredientsActionTypes.MOVE_BURGER_SELECTED_INGREDIENT: {
+			const ingredients = [...state.ingredients];
+			ingredients.splice(action.toIndex, 0, ingredients.splice(action.fromIndex, 1)[0]);
+			return {
+				...state,
+				ingredients: ingredients,
+			};
+		}
+
 		default:
 			return state;
 	}

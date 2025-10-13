@@ -8,7 +8,7 @@ import { registerOrder } from '../../services/thunks/order';
 import ConstructorBun from './constructor-bun/constructor-bun';
 import ConstructorFilling from './constructor-filling/constructor-filling';
 import { useDrop } from 'react-dnd';
-import { DropIngredient, IngredientDropType } from '../../model/burger';
+import { DragIngredient, IngredientDropType } from '../../model/burger';
 import { BurgerSelectedIngredientsActionTypes } from '../../services/actions/burger/constructor';
 
 function BurgerConstructor() {
@@ -23,11 +23,11 @@ function BurgerConstructor() {
 
 	const [, dropRef] = useDrop({
 		accept: IngredientDropType.filling,
-		drop(item) {
+		drop(dragItem) {
 			dispatch({
 				type: BurgerSelectedIngredientsActionTypes.ADD_BURGER_SELECTED_INGREDIENT,
 				ingredient: ingredients.find(
-					ingredient => ingredient._id === (item as DropIngredient).id,
+					ingredient => ingredient._id === (dragItem as DragIngredient).id,
 				),
 			});
 		},
@@ -84,12 +84,12 @@ function BurgerConstructor() {
 				<section className={styles.burger}>
 					<ConstructorBun type="top" />
 					<ul className={styles.customIngredients} ref={customIngredientsRef}>
-						{customIngredientItems.map(ingredient => (
+						{customIngredientItems.map((ingredient, index) => (
 							<li
 								key={ingredient?.uuid ?? 'empty-filling'}
 								className={styles.ingredient}
 							>
-								<ConstructorFilling ingredient={ingredient} />
+								<ConstructorFilling ingredient={ingredient} index={index} />
 							</li>
 						))}
 					</ul>

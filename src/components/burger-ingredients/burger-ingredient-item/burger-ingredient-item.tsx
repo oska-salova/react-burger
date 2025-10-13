@@ -1,7 +1,7 @@
 import { FC, memo } from 'react';
 import {
 	BurgerIngredient,
-	DropIngredient,
+	DragIngredient,
 	IngredientDropType,
 	IngredientType,
 } from '../../../model/burger';
@@ -29,7 +29,7 @@ const BurgerIngredientItem: FC<BurgerIngredientItemProps> = memo(
 				ingredient.type === IngredientType.bun
 					? IngredientDropType.bun
 					: IngredientDropType.filling,
-			item: { id: ingredient._id } as DropIngredient,
+			item: { id: ingredient._id } as DragIngredient,
 			canDrag() {
 				return !isOrderRegistrationInProgress;
 			},
