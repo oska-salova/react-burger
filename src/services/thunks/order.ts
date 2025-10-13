@@ -22,7 +22,7 @@ export const registerOrder = (ingredientIds: string[]) => async (dispatch: AppDi
 		if (responseData.success) {
 			dispatch({
 				type: OrderActionTypes.SET_ORDER_SUCCESS,
-				orderNumber: responseData.order.number ?? [],
+				order: responseData.order,
 			});
 		} else {
 			dispatch({

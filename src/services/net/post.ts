@@ -16,6 +16,9 @@ export async function setData<T>(
 		const response = await fetch(url, {
 			method: 'POST',
 			body: JSON.stringify(data),
+			headers: {
+				'Content-Type': 'application/json;charset=utf-8',
+			},
 			signal: abortController.signal,
 		});
 		abortController = null;
