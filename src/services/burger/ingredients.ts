@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { BurgerIngredient } from '../../../model/burger';
-import { IngredientsResponse } from '../../../model/net/burger.interface';
+import { BurgerIngredient } from '../../model/burger';
+import { IngredientsResponse } from '../../model/net/burger.interface';
 
 type IngredientsState = {
 	ingredients: BurgerIngredient[];

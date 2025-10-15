@@ -1,9 +1,9 @@
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
-import ingredientsReducer from './reducers/burger/ingredients';
-import burgerConstructorReducer from './reducers/burger/constructor';
-import currentIngredientDetailsReducer from './reducers/burger/ingredient-details';
-import orderReducer from './reducers/order';
+import ingredientsReducer from './burger/ingredients';
+import burgerConstructorReducer from './burger/constructor';
+import currentIngredientDetailsReducer from './burger/ingredient-details';
+import orderReducer from './order';
 
 export const store = configureStore({
 	reducer: {

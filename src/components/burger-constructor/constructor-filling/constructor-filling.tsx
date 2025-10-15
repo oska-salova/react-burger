@@ -4,7 +4,7 @@ import { useAppDispatch } from '../../../services/store';
 import { FC, useRef } from 'react';
 import { ConstructorIngredient } from '../../../model/burger';
 import { useDrag, useDrop } from 'react-dnd';
-import { burgerConstructorSlice } from '../../../services/reducers/burger/constructor';
+import { burgerConstructorSlice } from '../../../services/burger/constructor';
 
 const INTERNAL_DRAG_DROP_TYPE = 'constructor-ingredient';
 

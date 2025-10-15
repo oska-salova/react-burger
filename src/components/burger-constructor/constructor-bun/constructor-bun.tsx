@@ -4,7 +4,7 @@ import { useDrop } from 'react-dnd';
 import { useAppDispatch, useAppSelector } from '../../../services/store';
 import { FC } from 'react';
 import { DragIngredient, IngredientDropType } from '../../../model/burger';
-import { burgerConstructorSlice } from '../../../services/reducers/burger/constructor';
+import { burgerConstructorSlice } from '../../../services/burger/constructor';
 
 interface ConstructorBunProps {
 	type: 'top' | 'bottom';

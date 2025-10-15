@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { Order } from '../../model/order';
-import { RegisterOrderErrorResponse, RegisterOrderResponse } from '../../model/net/order.interface';
+import { Order } from '../model/order';
+import { RegisterOrderErrorResponse, RegisterOrderResponse } from '../model/net/order.interface';
 
 type OrderState = {
 	order: Order | null;

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { BurgerIngredient } from '../../../model/burger';
+import { BurgerIngredient } from '../../model/burger';
 
 type CurrentIngredientState = {
 	ingredient: BurgerIngredient | null;

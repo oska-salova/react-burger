@@ -8,8 +8,8 @@ import ConstructorBun from './constructor-bun/constructor-bun';
 import ConstructorFilling from './constructor-filling/constructor-filling';
 import { useDrop } from 'react-dnd';
 import { DragIngredient, IngredientDropType } from '../../model/burger';
-import { burgerConstructorSlice } from '../../services/reducers/burger/constructor';
-import { createOrder } from '../../services/reducers/order';
+import { burgerConstructorSlice } from '../../services/burger/constructor';
+import { createOrder } from '../../services/order';
 
 function BurgerConstructor() {
 	const dispatch = useAppDispatch();

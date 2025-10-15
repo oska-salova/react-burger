@@ -6,8 +6,8 @@ import BurgerIngredientItem from './burger-ingredient-item/burger-ingredient-ite
 import IngredientDetails from './ingredient-details/ingredient-details';
 import { useModal } from '../../hooks/useModal';
 import { useAppDispatch, useAppSelector } from '../../services/store';
-import { getIngredients } from '../../services/reducers/burger/ingredients';
-import { currentIngredientDetailsSlice } from '../../services/reducers/burger/ingredient-details';
+import { getIngredients } from '../../services/burger/ingredients';
+import { currentIngredientDetailsSlice } from '../../services/burger/ingredient-details';
 
 const GROUP_NAMES: Record<IngredientType, string> = {
 	[IngredientType.bun]: 'Булки',
