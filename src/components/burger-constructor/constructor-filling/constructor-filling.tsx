@@ -1,10 +1,10 @@
 import { ConstructorElement, DragIcon } from '@ya.praktikum/react-developer-burger-ui-components';
 import styles from './constructor-filling.module.css';
 import { useAppDispatch } from '../../../services/store';
-import { BurgerSelectedIngredientsActionTypes } from '../../../services/actions/burger/constructor';
 import { FC, useRef } from 'react';
 import { ConstructorIngredient } from '../../../model/burger';
 import { useDrag, useDrop } from 'react-dnd';
+import { burgerConstructorSlice } from '../../../services/reducers/burger/constructor';
 
 const INTERNAL_DRAG_DROP_TYPE = 'constructor-ingredient';
 
@@ -22,21 +22,21 @@ const ConstructorFilling: FC<ConstructorFillingProps> = ({ ingredient, index }) 
 	const dispatch = useAppDispatch();
 
 	const handleClose = () => {
-		dispatch({
-			type: BurgerSelectedIngredientsActionTypes.DELETE_BURGER_SELECTED_INGREDIENT,
-			ingredient: ingredient,
-		});
+		dispatch(
+			burgerConstructorSlice.actions.deleteIngredient(ingredient as ConstructorIngredient),
+		);
 	};
 
 	const ref = useRef<HTMLDivElement>(null);
 	const [, dropRef] = useDrop({
 		accept: INTERNAL_DRAG_DROP_TYPE,
 		drop(dragItem) {
-			dispatch({
-				type: BurgerSelectedIngredientsActionTypes.MOVE_BURGER_SELECTED_INGREDIENT,
-				fromIndex: (dragItem as DragItem).index,
-				toIndex: index,
-			});
+			dispatch(
+				burgerConstructorSlice.actions.moveIngredient({
+					fromIndex: (dragItem as DragItem).index,
+					toIndex: index,
+				}),
+			);
 		},
 	});
 

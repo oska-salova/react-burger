@@ -1,5 +1,6 @@
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { Order } from '../../model/order';
-import { OrderActionTypes, type SetOrderActions } from '../actions/order';
+import { RegisterOrderErrorResponse, RegisterOrderResponse } from '../../model/net/order.interface';
 
 type OrderState = {
 	order: Order | null;
@@ -13,33 +14,64 @@ const initialState: OrderState = {
 	error: null,
 };
 
-export function orderReducer(state = initialState, action: SetOrderActions): OrderState {
-	switch (action.type) {
-		case OrderActionTypes.SET_ORDER_SUCCESS:
-			return {
-				...state,
-				order: action.order,
-				registration: false,
-				error: null,
-			};
+const ORDERS_URL = 'https://norma.nomoreparties.space/api/orders';
+const GENERAL_ERROR_MESSAGE = 'An error occurred while registering the order.';
 
-		case OrderActionTypes.SET_ORDER_REQUEST:
-			return {
-				...state,
-				order: null,
-				registration: true,
-				error: null,
-			};
+export const createOrder = createAsyncThunk<RegisterOrderResponse, string[]>(
+	'order/create',
+	async (ingredientIds: string[], thunkAPI) => {
+		try {
+			const response = await fetch(ORDERS_URL, {
+				method: 'POST',
+				body: JSON.stringify({
+					ingredients: ingredientIds,
+				}),
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			});
 
-		case OrderActionTypes.SET_ORDER_ERROR:
-			return {
-				...state,
-				order: null,
-				registration: false,
-				error: action.error,
-			};
+			if (!response.ok) {
+				const errorResponse = (await response.json()) as RegisterOrderErrorResponse;
+				return thunkAPI.rejectWithValue({
+					message: errorResponse.message || GENERAL_ERROR_MESSAGE,
+				});
+			}
 
-		default:
-			return state;
-	}
-}
+			return (await response.json()) as RegisterOrderResponse;
+		} catch (error: unknown) {
+			const resultError =
+				!(error instanceof Error) || error instanceof SyntaxError
+					? { message: GENERAL_ERROR_MESSAGE }
+					: { message: error.message };
+			return thunkAPI.rejectWithValue(resultError);
+		}
+	},
+);
+
+export const orderSlice = createSlice({
+	name: 'order',
+	initialState,
+	reducers: {},
+	extraReducers: builder => {
+		builder
+			.addCase(createOrder.fulfilled, (state, { payload }) => {
+				state.order = payload.order;
+				state.registration = false;
+				state.error = null;
+			})
+			.addCase(createOrder.rejected, (state, action) => {
+				state.order = null;
+				state.registration = false;
+				state.error =
+					(action.payload as { message: string }).message ?? 'Unexpected network error';
+			})
+			.addCase(createOrder.pending, state => {
+				state.order = null;
+				state.registration = true;
+				state.error = null;
+			});
+	},
+});
+
+export default orderSlice.reducer;

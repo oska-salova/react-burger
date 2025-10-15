@@ -2,17 +2,17 @@ import { ConstructorElement } from '@ya.praktikum/react-developer-burger-ui-comp
 import styles from './constructor-bun.module.css';
 import { useDrop } from 'react-dnd';
 import { useAppDispatch, useAppSelector } from '../../../services/store';
-import { BurgerSelectedIngredientsActionTypes } from '../../../services/actions/burger/constructor';
 import { FC } from 'react';
 import { DragIngredient, IngredientDropType } from '../../../model/burger';
+import { burgerConstructorSlice } from '../../../services/reducers/burger/constructor';
 
 interface ConstructorBunProps {
 	type: 'top' | 'bottom';
 }
 const ConstructorBun: FC<ConstructorBunProps> = ({ type }) => {
 	const dispatch = useAppDispatch();
-	const ingredients = useAppSelector(state => state.ingredients.ingredients);
-	const selectedBun = useAppSelector(state => state.selectedIngredients.bun);
+	const ingredients = useAppSelector(state => state.ingredientsReducer.ingredients);
+	const selectedBun = useAppSelector(state => state.burgerConstructorReducer.bun);
 
 	const [{ isHover }, dropTarget] = useDrop({
 		accept: IngredientDropType.bun,
@@ -20,12 +20,10 @@ const ConstructorBun: FC<ConstructorBunProps> = ({ type }) => {
 			isHover: monitor.isOver() && monitor.canDrop(),
 		}),
 		drop(dragItem) {
-			dispatch({
-				type: BurgerSelectedIngredientsActionTypes.SET_BURGER_SELECTED_BUN,
-				bun: ingredients.find(
-					ingredient => ingredient._id === (dragItem as DragIngredient).id,
-				),
-			});
+			const dragIngredient = ingredients.find(
+				ingredient => ingredient._id === (dragItem as DragIngredient).id,
+			);
+			dragIngredient && dispatch(burgerConstructorSlice.actions.setBun(dragIngredient));
 		},
 		canDrop(item) {
 			return (item as DragIngredient).id !== selectedBun?._id;

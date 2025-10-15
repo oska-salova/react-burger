@@ -5,9 +5,9 @@ import { BurgerIngredient, IngredientType } from '../../model/burger';
 import BurgerIngredientItem from './burger-ingredient-item/burger-ingredient-item';
 import IngredientDetails from './ingredient-details/ingredient-details';
 import { useModal } from '../../hooks/useModal';
-import { getIngredients } from '../../services/thunks/burger/ingredients';
 import { useAppDispatch, useAppSelector } from '../../services/store';
-import { CurrentBurgerIngredientActionTypes } from '../../services/actions/burger/ingredient-details';
+import { getIngredients } from '../../services/reducers/burger/ingredients';
+import { currentIngredientDetailsSlice } from '../../services/reducers/burger/ingredient-details';
 
 const GROUP_NAMES: Record<IngredientType, string> = {
 	[IngredientType.bun]: 'Булки',
@@ -17,14 +17,20 @@ const GROUP_NAMES: Record<IngredientType, string> = {
 
 function BurgerIngredients() {
 	const dispatch = useAppDispatch();
-	const isLoading = useAppSelector(state => state.ingredients.loading);
-	const ingredients = useAppSelector(state => state.ingredients.ingredients);
-	const selectedIngredients = useAppSelector(state => state.selectedIngredients.ingredients);
-	const selectedBun = useAppSelector(state => state.selectedIngredients.bun);
-	const error = useAppSelector(state => state.ingredients.error);
+	const isLoading = useAppSelector(state => state.ingredientsReducer.loading);
+	const ingredients = useAppSelector(state => state.ingredientsReducer.ingredients);
+	const selectedIngredients = useAppSelector(state => state.burgerConstructorReducer.ingredients);
+	const selectedBun = useAppSelector(state => state.burgerConstructorReducer.bun);
+	const error = useAppSelector(state => state.ingredientsReducer.error);
 
 	useEffect(() => {
-		dispatch(getIngredients());
+		const controller = new AbortController();
+
+		dispatch(getIngredients(undefined, { signal: controller.signal }));
+
+		return () => {
+			controller.abort();
+		};
 	}, [dispatch]);
 
 	const [currentTab, setCurrentTab] = useState(IngredientType.bun.toString());
@@ -48,7 +54,7 @@ function BurgerIngredients() {
 	}, [selectedIngredients, selectedBun]);
 
 	const ingredientGroups = useMemo<Record<IngredientType, BurgerIngredient[]>>(() => {
-		return ingredients
+		return [...ingredients]
 			.sort((a, b) => {
 				const order = Object.keys(IngredientType);
 				const indexA = order.indexOf(a.type);
@@ -120,18 +126,13 @@ function BurgerIngredients() {
 
 	const [isModalOpen, modal, openModal] = useModal('Детали ингредиента');
 	const handleIngredientClick = (ingredient: BurgerIngredient) => {
-		dispatch({
-			type: CurrentBurgerIngredientActionTypes.SET_CURRENT_BURGER_INGREDIENT,
-			ingredient: ingredient,
-		});
+		dispatch(currentIngredientDetailsSlice.actions.set(ingredient));
 		openModal(<IngredientDetails />);
 	};
 
 	useEffect(() => {
 		if (!isModalOpen) {
-			dispatch({
-				type: CurrentBurgerIngredientActionTypes.DELETE_CURRENT_BURGER_INGREDIENT,
-			});
+			dispatch(currentIngredientDetailsSlice.actions.delete());
 		}
 	}, [isModalOpen]);
 

@@ -1,8 +1,5 @@
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { BurgerIngredient } from '../../../model/burger';
-import {
-	CurrentBurgerIngredientActions,
-	CurrentBurgerIngredientActionTypes,
-} from '../../actions/burger/ingredient-details';
 
 type CurrentIngredientState = {
 	ingredient: BurgerIngredient | null;
@@ -12,24 +9,17 @@ const initialState: CurrentIngredientState = {
 	ingredient: null,
 };
 
-export function currentIngredientReducer(
-	state = initialState,
-	action: CurrentBurgerIngredientActions,
-): CurrentIngredientState {
-	switch (action.type) {
-		case CurrentBurgerIngredientActionTypes.SET_CURRENT_BURGER_INGREDIENT:
-			return {
-				...state,
-				ingredient: action.ingredient,
-			};
+export const currentIngredientDetailsSlice = createSlice({
+	name: 'ingredientDetails',
+	initialState,
+	reducers: {
+		set(state, action: PayloadAction<BurgerIngredient>) {
+			state.ingredient = action.payload;
+		},
+		delete(state) {
+			state.ingredient = null;
+		},
+	},
+});
 
-		case CurrentBurgerIngredientActionTypes.DELETE_CURRENT_BURGER_INGREDIENT:
-			return {
-				...state,
-				ingredient: null,
-			};
-
-		default:
-			return state;
-	}
-}
+export default currentIngredientDetailsSlice.reducer;

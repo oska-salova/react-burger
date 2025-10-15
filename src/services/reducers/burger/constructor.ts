@@ -1,8 +1,5 @@
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { BurgerIngredient, ConstructorIngredient } from '../../../model/burger';
-import {
-	BurgerSelectedIngredientsActionTypes,
-	type BurgerSelectedIngredientsActions,
-} from '../../actions/burger/constructor';
 import { v4 as uuidv4 } from 'uuid';
 
 type SelectedIngredientsState = {
@@ -15,41 +12,29 @@ const initialState: SelectedIngredientsState = {
 	ingredients: [],
 };
 
-export function selectedIngredientsReducer(
-	state = initialState,
-	action: BurgerSelectedIngredientsActions,
-): SelectedIngredientsState {
-	switch (action.type) {
-		case BurgerSelectedIngredientsActionTypes.SET_BURGER_SELECTED_BUN:
-			return {
-				...state,
-				bun: { ...action.bun },
-			};
+export const burgerConstructorSlice = createSlice({
+	name: 'burgerConstructor',
+	initialState,
+	reducers: {
+		setBun(state, action: PayloadAction<BurgerIngredient>) {
+			state.bun = action.payload;
+		},
+		addIngredient(state, action: PayloadAction<BurgerIngredient>) {
+			state.ingredients.unshift({ ...action.payload, uuid: uuidv4() });
+		},
+		deleteIngredient(state, action: PayloadAction<ConstructorIngredient>) {
+			state.ingredients = state.ingredients.filter(
+				ingredient => ingredient.uuid !== action.payload.uuid,
+			);
+		},
+		moveIngredient(state, action: PayloadAction<{ fromIndex: number; toIndex: number }>) {
+			state.ingredients.splice(
+				action.payload.toIndex,
+				0,
+				state.ingredients.splice(action.payload.fromIndex, 1)[0],
+			);
+		},
+	},
+});
 
-		case BurgerSelectedIngredientsActionTypes.ADD_BURGER_SELECTED_INGREDIENT:
-			return {
-				...state,
-				ingredients: [{ ...action.ingredient, uuid: uuidv4() }, ...state.ingredients],
-			};
-
-		case BurgerSelectedIngredientsActionTypes.DELETE_BURGER_SELECTED_INGREDIENT:
-			return {
-				...state,
-				ingredients: state.ingredients.filter(
-					ingredient => ingredient.uuid !== action.ingredient.uuid,
-				),
-			};
-
-		case BurgerSelectedIngredientsActionTypes.MOVE_BURGER_SELECTED_INGREDIENT: {
-			const ingredients = [...state.ingredients];
-			ingredients.splice(action.toIndex, 0, ingredients.splice(action.fromIndex, 1)[0]);
-			return {
-				...state,
-				ingredients: ingredients,
-			};
-		}
-
-		default:
-			return state;
-	}
-}
+export default burgerConstructorSlice.reducer;

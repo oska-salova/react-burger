@@ -2,7 +2,7 @@ import styles from './ingredient-details.module.css';
 import { useAppSelector } from '../../../services/store';
 
 const IngredientDetails = () => {
-	const ingredient = useAppSelector(state => state.currentIngredient.ingredient);
+	const ingredient = useAppSelector(state => state.currentIngredientDetailsReducer.ingredient);
 
 	const getNutrient = (title: string, value: number) => (
 		<div className={styles.nutrient}>

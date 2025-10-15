@@ -4,19 +4,19 @@ import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useModal } from '../../hooks/useModal';
 import OrderDetails from '../order/order-details/order-details';
 import { useAppDispatch, useAppSelector } from '../../services/store';
-import { registerOrder } from '../../services/thunks/order';
 import ConstructorBun from './constructor-bun/constructor-bun';
 import ConstructorFilling from './constructor-filling/constructor-filling';
 import { useDrop } from 'react-dnd';
 import { DragIngredient, IngredientDropType } from '../../model/burger';
-import { BurgerSelectedIngredientsActionTypes } from '../../services/actions/burger/constructor';
+import { burgerConstructorSlice } from '../../services/reducers/burger/constructor';
+import { createOrder } from '../../services/reducers/order';
 
 function BurgerConstructor() {
 	const dispatch = useAppDispatch();
-	const ingredients = useAppSelector(state => state.ingredients.ingredients);
-	const bun = useAppSelector(state => state.selectedIngredients.bun);
-	const customIngredients = useAppSelector(state => state.selectedIngredients.ingredients);
-	const orderState = useAppSelector(state => state.order);
+	const ingredients = useAppSelector(state => state.ingredientsReducer.ingredients);
+	const bun = useAppSelector(state => state.burgerConstructorReducer.bun);
+	const customIngredients = useAppSelector(state => state.burgerConstructorReducer.ingredients);
+	const orderState = useAppSelector(state => state.orderReducer);
 
 	const customIngredientsRef = useRef<HTMLUListElement | null>(null);
 	const [isModalOpen, modal, openModal] = useModal('', <OrderDetails />);
@@ -24,12 +24,11 @@ function BurgerConstructor() {
 	const [, dropRef] = useDrop({
 		accept: IngredientDropType.filling,
 		drop(dragItem) {
-			dispatch({
-				type: BurgerSelectedIngredientsActionTypes.ADD_BURGER_SELECTED_INGREDIENT,
-				ingredient: ingredients.find(
-					ingredient => ingredient._id === (dragItem as DragIngredient).id,
-				),
-			});
+			const dragIngredient = ingredients.find(
+				ingredient => ingredient._id === (dragItem as DragIngredient).id,
+			);
+			dragIngredient &&
+				dispatch(burgerConstructorSlice.actions.addIngredient(dragIngredient));
 		},
 	});
 	dropRef(customIngredientsRef);
@@ -60,7 +59,7 @@ function BurgerConstructor() {
 	const handleOrderButtonClick = () => {
 		if (bun) {
 			dispatch(
-				registerOrder([
+				createOrder([
 					bun._id,
 					...customIngredients.map(ingredient => ingredient._id),
 					bun._id,

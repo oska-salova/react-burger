@@ -4,9 +4,9 @@ import { statusComment, statusDescription, statusImages } from './order-details-
 import { useAppSelector } from '../../../services/store';
 
 const OrderDetails = () => {
-	const isLoading = useAppSelector(state => state.order.registration);
-	const orderNumber = useAppSelector(state => state.order.order?.number);
-	const error = useAppSelector(state => state.order.error);
+	const isLoading = useAppSelector(state => state.orderReducer.registration);
+	const orderNumber = useAppSelector(state => state.orderReducer.order?.number);
+	const error = useAppSelector(state => state.orderReducer.error);
 
 	const getOrderStatus = (status: OrderStatus) => (
 		<>

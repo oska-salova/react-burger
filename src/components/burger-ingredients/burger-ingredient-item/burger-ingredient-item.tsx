@@ -18,7 +18,9 @@ interface BurgerIngredientItemProps {
 
 const BurgerIngredientItem: FC<BurgerIngredientItemProps> = memo(
 	({ ingredient, count = 0, onClick }) => {
-		const isOrderRegistrationInProgress = useAppSelector(state => state.order.registration);
+		const isOrderRegistrationInProgress = useAppSelector(
+			state => state.orderReducer.registration,
+		);
 
 		const handleIngredientClick = () => {
 			onClick(ingredient);
