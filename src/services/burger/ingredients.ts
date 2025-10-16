@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { BurgerIngredient } from '../../model/burger';
 import { IngredientsResponse } from '../../model/net/burger.interface';
+import { get } from '../../net/net';
 
 type IngredientsState = {
 	ingredients: BurgerIngredient[];
@@ -14,29 +15,27 @@ const initialState: IngredientsState = {
 	error: null,
 };
 
-const INGREDIENTS_URL = 'https://norma.nomoreparties.space/api/ingredients';
 const GENERAL_ERROR_MESSAGE = 'An error occurred while retrieving the list of ingredients';
 
 export const getIngredients = createAsyncThunk<BurgerIngredient[]>(
 	'ingredients/get',
 	async (_, thunkAPI) => {
-		try {
-			const response = await fetch(INGREDIENTS_URL, {
-				signal: thunkAPI.signal,
-			});
-			if (!response.ok) {
+		return get<IngredientsResponse>('/api/ingredients', {
+			signal: thunkAPI.signal,
+		})
+			.then(result => {
+				if (!(result as IngredientsResponse).success) {
+					return thunkAPI.rejectWithValue({
+						message: GENERAL_ERROR_MESSAGE,
+					});
+				}
+				return (result as IngredientsResponse).data;
+			})
+			.catch(error => {
 				return thunkAPI.rejectWithValue({
-					message: GENERAL_ERROR_MESSAGE,
+					message: error.message ?? GENERAL_ERROR_MESSAGE,
 				});
-			}
-			return ((await response.json()) as IngredientsResponse).data;
-		} catch (error: unknown) {
-			const resultError =
-				!(error instanceof Error) || error instanceof SyntaxError
-					? { message: GENERAL_ERROR_MESSAGE }
-					: { message: error.message };
-			return thunkAPI.rejectWithValue(resultError);
-		}
+			});
 	},
 );
 

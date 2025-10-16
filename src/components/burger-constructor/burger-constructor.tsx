@@ -69,7 +69,13 @@ function BurgerConstructor() {
 	};
 
 	useEffect(() => {
-		if (orderState.error || orderState.order) openModal();
+		if (orderState.error || orderState.order) {
+			openModal();
+
+			if (orderState.order) {
+				dispatch(burgerConstructorSlice.actions.clear());
+			}
+		}
 	}, [orderState]);
 
 	if (!ingredients.length) {

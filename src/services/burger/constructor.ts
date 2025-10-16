@@ -19,8 +19,13 @@ export const burgerConstructorSlice = createSlice({
 		setBun(state, action: PayloadAction<BurgerIngredient>) {
 			state.bun = action.payload;
 		},
-		addIngredient(state, action: PayloadAction<BurgerIngredient>) {
-			state.ingredients.unshift({ ...action.payload, uuid: uuidv4() });
+		addIngredient: {
+			reducer: (state, action: PayloadAction<ConstructorIngredient>) => {
+				state.ingredients.unshift(action.payload);
+			},
+			prepare: (ingredient: BurgerIngredient) => {
+				return { payload: { ...ingredient, uuid: uuidv4() } as ConstructorIngredient };
+			},
 		},
 		deleteIngredient(state, action: PayloadAction<ConstructorIngredient>) {
 			state.ingredients = state.ingredients.filter(
@@ -33,6 +38,9 @@ export const burgerConstructorSlice = createSlice({
 				0,
 				state.ingredients.splice(action.payload.fromIndex, 1)[0],
 			);
+		},
+		clear() {
+			return initialState;
 		},
 	},
 });
