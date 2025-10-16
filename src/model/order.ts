@@ -3,6 +3,5 @@ export enum OrderStatus {
 }
 
 export interface Order {
-	id: string;
-	status: OrderStatus;
+	number: number;
 }

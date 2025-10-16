@@ -42,6 +42,10 @@ body {
 	gap: 48px;
 }
 
+.dragHover {
+	border: 1px solid var(--colors-interface-accent);
+}
+
 @media (max-width: 1280px) {
 	.main-content {
 		gap: 24px;

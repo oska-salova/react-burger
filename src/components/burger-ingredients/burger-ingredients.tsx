@@ -5,10 +5,9 @@ import { BurgerIngredient, IngredientType } from '../../model/burger';
 import BurgerIngredientItem from './burger-ingredient-item/burger-ingredient-item';
 import IngredientDetails from './ingredient-details/ingredient-details';
 import { useModal } from '../../hooks/useModal';
-
-interface BurgerIngredientsProps {
-	ingredients: BurgerIngredient[];
-}
+import { useAppDispatch, useAppSelector } from '../../services/store';
+import { getIngredients } from '../../services/burger/ingredients';
+import { currentIngredientDetailsSlice } from '../../services/burger/ingredient-details';
 
 const GROUP_NAMES: Record<IngredientType, string> = {
 	[IngredientType.bun]: 'Булки',
@@ -16,7 +15,24 @@ const GROUP_NAMES: Record<IngredientType, string> = {
 	[IngredientType.main]: 'Начинки',
 };
 
-function BurgerIngredients(props: BurgerIngredientsProps) {
+function BurgerIngredients() {
+	const dispatch = useAppDispatch();
+	const isLoading = useAppSelector(state => state.ingredientsReducer.loading);
+	const ingredients = useAppSelector(state => state.ingredientsReducer.ingredients);
+	const selectedIngredients = useAppSelector(state => state.burgerConstructorReducer.ingredients);
+	const selectedBun = useAppSelector(state => state.burgerConstructorReducer.bun);
+	const error = useAppSelector(state => state.ingredientsReducer.error);
+
+	useEffect(() => {
+		const controller = new AbortController();
+
+		dispatch(getIngredients(undefined, { signal: controller.signal }));
+
+		return () => {
+			controller.abort();
+		};
+	}, [dispatch]);
+
 	const [currentTab, setCurrentTab] = useState(IngredientType.bun.toString());
 	const ingredientsRef = useRef<HTMLDivElement | null>(null);
 	const tabContentRefs = useRef<Record<IngredientType, HTMLElement | null>>({
@@ -24,17 +40,21 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 		[IngredientType.sauce]: null,
 		[IngredientType.main]: null,
 	});
-	const [tabsContentVisibility, setTabsContentVisibility] = useState({
-		[IngredientType.bun]: false,
-		[IngredientType.sauce]: false,
-		[IngredientType.main]: false,
-	});
 	const handleTabContentRefs = (key: IngredientType) => (tabRef: HTMLDivElement) => {
 		tabContentRefs.current[key] = tabRef;
 	};
 
+	const selectedIngredientCounts = useMemo<Record<string, number>>(() => {
+		const source = selectedBun ? { [selectedBun._id]: 2 } : {};
+		return selectedIngredients.reduce((counts, ingredient) => {
+			counts[ingredient._id] ??= 0;
+			counts[ingredient._id] += 1;
+			return counts;
+		}, source);
+	}, [selectedIngredients, selectedBun]);
+
 	const ingredientGroups = useMemo<Record<IngredientType, BurgerIngredient[]>>(() => {
-		return props.ingredients
+		return [...ingredients]
 			.sort((a, b) => {
 				const order = Object.keys(IngredientType);
 				const indexA = order.indexOf(a.type);
@@ -50,7 +70,7 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 				},
 				{} as { [key in IngredientType]: BurgerIngredient[] },
 			);
-	}, [props.ingredients]);
+	}, [ingredients]);
 
 	const updateIngredientsTopPosition = () => {
 		if (ingredientsRef?.current) {
@@ -66,7 +86,7 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 		return () => {
 			window.removeEventListener('resize', updateIngredientsTopPosition);
 		};
-	}, []);
+	}, [ingredients]);
 
 	const handleTabClick = (tab: string) => {
 		setCurrentTab(tab);
@@ -77,12 +97,7 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 		}
 	};
 
-	const [isModalOpen, modal, openModal] = useModal('Детали ингредиента');
-	const handleIngredientClick = (ingredient: BurgerIngredient) => {
-		openModal(<IngredientDetails ingredient={ingredient} />);
-	};
-
-	useEffect(() => {
+	const handleIngredientsScroll = () => {
 		if (
 			!ingredientsRef.current ||
 			!tabContentRefs.current ||
@@ -90,55 +105,44 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 		)
 			return;
 
-		const observer = new IntersectionObserver(
-			entries => {
-				const changedTabs = entries.reduce(
-					(cur, entry) => {
-						const tab = Object.keys(tabContentRefs.current).find(
-							key => tabContentRefs.current[key as IngredientType] === entry.target,
-						);
-						return { ...cur, [tab as IngredientType]: entry.isIntersecting };
-					},
-					{} as Record<IngredientType, boolean>,
-				);
-
-				setTabsContentVisibility(tabsVisibility => {
-					return { ...tabsVisibility, ...changedTabs };
-				});
-
-				const newVisibleEntry = entries.find(entry => entry.isIntersecting);
-				let newVisibleTab;
-				if (newVisibleEntry) {
-					newVisibleTab = Object.keys(tabContentRefs.current).find(
-						key =>
-							tabContentRefs.current[key as IngredientType] ===
-							newVisibleEntry?.target,
-					);
-				} else {
-					const newHiddenTabs = entries.map(entry =>
-						Object.keys(tabContentRefs.current).find(
-							key => tabContentRefs.current[key as IngredientType] === entry.target,
-						),
-					);
-					newVisibleTab = Object.keys(tabsContentVisibility).find(
-						tab =>
-							tabsContentVisibility[tab as IngredientType] &&
-							!newHiddenTabs.includes(tab),
-					);
-				}
-				newVisibleTab && setCurrentTab(newVisibleTab);
-			},
-			{ threshold: 0, root: ingredientsRef.current },
+		const ingredientContainerTop = ingredientsRef.current.getBoundingClientRect().top;
+		const contentHeaderTops = Object.values(tabContentRefs.current).map(
+			value => value?.getBoundingClientRect().top ?? Infinity,
 		);
 
-		Object.values(tabContentRefs.current).forEach(value => {
-			observer.observe(value as Element);
+		let minIndex = 0;
+		let curMinDistance = Math.abs(ingredientContainerTop - contentHeaderTops[minIndex]);
+		contentHeaderTops.forEach((contentHeaderTop: number, index: number) => {
+			const distance = Math.abs(ingredientContainerTop - contentHeaderTop);
+			if (distance < curMinDistance) {
+				curMinDistance = distance;
+				minIndex = index;
+			}
 		});
 
-		return () => {
-			observer.disconnect();
-		};
-	}, [ingredientsRef, tabContentRefs]);
+		const tab = Object.keys(tabContentRefs.current)[minIndex];
+		setCurrentTab(tab);
+	};
+
+	const [isModalOpen, modal, openModal] = useModal('Детали ингредиента');
+	const handleIngredientClick = (ingredient: BurgerIngredient) => {
+		dispatch(currentIngredientDetailsSlice.actions.set(ingredient));
+		openModal(<IngredientDetails />);
+	};
+
+	useEffect(() => {
+		if (!isModalOpen) {
+			dispatch(currentIngredientDetailsSlice.actions.delete());
+		}
+	}, [isModalOpen]);
+
+	if (isLoading) {
+		return <p className="text text_type_main-default m-2">Loading...</p>;
+	}
+
+	if (error) {
+		return <p className="text text_type_main-default m-2 text_color_error">{error}</p>;
+	}
 
 	return (
 		<>
@@ -160,7 +164,11 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 						);
 					})}
 				</div>
-				<div className={styles.ingredients} ref={ingredientsRef}>
+				<div
+					className={styles.ingredients}
+					ref={ingredientsRef}
+					onScroll={handleIngredientsScroll}
+				>
 					{Object.entries(ingredientGroups).map(([type, ingredients]) => (
 						<div key={type} ref={handleTabContentRefs(type as IngredientType)}>
 							<p
@@ -173,7 +181,7 @@ function BurgerIngredients(props: BurgerIngredientsProps) {
 									<li key={ingredient._id} className={styles.ingredient}>
 										<BurgerIngredientItem
 											ingredient={ingredient}
-											count={1}
+											count={selectedIngredientCounts[ingredient._id]}
 											onClick={handleIngredientClick}
 										/>
 									</li>
