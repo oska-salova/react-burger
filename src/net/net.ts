@@ -1,11 +1,14 @@
-export const SERVER_URL = 'https://norma.nomoreparties.space';
+import { ErrorResponse, SuccessResponse } from '../model/net/general.interface';
 
-export async function get<T, S = void>(endpoint: string, options?: RequestInit): Promise<T | S> {
-	return request<T, S>(endpoint, { ...options, method: 'GET' });
+const SERVER_URL = 'https://norma.nomoreparties.space';
+const REQUEST_BASE_URL = `${SERVER_URL}/api/`;
+
+export async function get<T>(endpoint: string, options?: RequestInit): Promise<T> {
+	return request<T>(endpoint, { ...options, method: 'GET' });
 }
 
-export async function post<T, S = void>(endpoint: string, options?: RequestInit): Promise<T | S> {
-	return request<T, S>(endpoint, {
+export async function post<T>(endpoint: string, options?: RequestInit): Promise<T> {
+	return request<T>(endpoint, {
 		...options,
 		method: 'POST',
 		headers: {
@@ -15,17 +18,25 @@ export async function post<T, S = void>(endpoint: string, options?: RequestInit)
 	});
 }
 
-async function request<T, S>(endpoint: string, options?: RequestInit): Promise<T | S> {
-	return fetch(`${SERVER_URL}${endpoint}`, options)
-		.then(checkResponse<T, S>)
+async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
+	return fetch(`${REQUEST_BASE_URL}${endpoint}`, options)
+		.then(checkResponse)
+		.then(checkSuccess<T>)
 		.catch(parseError);
 }
 
-function checkResponse<T, S>(response: Response): Promise<T | S> {
-	if (!response.ok) {
-		return response.json() as Promise<S>;
+function checkResponse(response: Response): Promise<SuccessResponse | ErrorResponse> {
+	if (response.ok) {
+		return response.json() as Promise<SuccessResponse>;
 	}
-	return response.json() as Promise<T>;
+	return response.json() as Promise<ErrorResponse>;
+}
+
+function checkSuccess<T>(result: SuccessResponse | ErrorResponse | null): Promise<T> {
+	if (result?.success) {
+		return Promise.resolve(result as T);
+	}
+	return Promise.reject(new Error(result?.message));
 }
 
 function parseError(error: unknown): never {

@@ -20,17 +20,10 @@ const GENERAL_ERROR_MESSAGE = 'An error occurred while retrieving the list of in
 export const getIngredients = createAsyncThunk<BurgerIngredient[]>(
 	'ingredients/get',
 	async (_, thunkAPI) => {
-		return get<IngredientsResponse>('/api/ingredients', {
+		return get<IngredientsResponse>('ingredients', {
 			signal: thunkAPI.signal,
 		})
-			.then(result => {
-				if (!(result as IngredientsResponse).success) {
-					return thunkAPI.rejectWithValue({
-						message: GENERAL_ERROR_MESSAGE,
-					});
-				}
-				return (result as IngredientsResponse).data;
-			})
+			.then(result => result.data)
 			.catch(error => {
 				return thunkAPI.rejectWithValue({
 					message: error.message ?? GENERAL_ERROR_MESSAGE,

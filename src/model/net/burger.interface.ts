@@ -1,6 +1,6 @@
 import { BurgerIngredient } from '../burger';
+import { SuccessResponse } from './general.interface';
 
-export interface IngredientsResponse {
-	success: boolean;
+export interface IngredientsResponse extends SuccessResponse {
 	data: BurgerIngredient[];
 }

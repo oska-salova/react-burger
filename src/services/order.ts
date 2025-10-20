@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { Order } from '../model/order';
-import { RegisterOrderErrorResponse, RegisterOrderResponse } from '../model/net/order.interface';
+import { RegisterOrderResponse } from '../model/net/order.interface';
 import { post } from '../net/net';
 
 type OrderState = {
@@ -23,22 +23,13 @@ export const createOrder = createAsyncThunk<RegisterOrderResponse, string[]>(
 		const body = {
 			ingredients: ingredientIds,
 		};
-		return post<RegisterOrderResponse, RegisterOrderErrorResponse>('/api/orders', {
+		return post<RegisterOrderResponse>('orders', {
 			body: JSON.stringify(body),
-		})
-			.then(result => {
-				if (!result.success) {
-					return thunkAPI.rejectWithValue({
-						message: result.message,
-					});
-				}
-				return result as RegisterOrderResponse;
-			})
-			.catch(error => {
-				return thunkAPI.rejectWithValue({
-					message: error.message ?? GENERAL_ERROR_MESSAGE,
-				});
+		}).catch(error => {
+			return thunkAPI.rejectWithValue({
+				message: error.message ?? GENERAL_ERROR_MESSAGE,
 			});
+		});
 	},
 );
 
