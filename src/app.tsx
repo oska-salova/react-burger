@@ -2,7 +2,7 @@ import { Provider } from 'react-redux';
 import AppHeader from './components/app-header/app-header';
 import { store } from './services/store';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import HomePage from './pages/home';
+import HomePage from './pages/home/home';
 import { AppRoutes } from './pages/config';
 import OrderFeedPage from './pages/order-feed';
 import ProfilePage from './pages/profile';
@@ -14,14 +14,12 @@ function App() {
 			<BrowserRouter>
 				<AppHeader />
 				<main className="main">
-					<div className="main-content">
-						<Routes>
-							<Route path={AppRoutes.Home} element={<HomePage />} />
-							<Route path={AppRoutes.OrderFeed} element={<OrderFeedPage />} />
-							<Route path={AppRoutes.Profile} element={<ProfilePage />} />
-							<Route path={AppRoutes.NotFound} element={<NotFoundPage />} />
-						</Routes>
-					</div>
+					<Routes>
+						<Route path={AppRoutes.Home} element={<HomePage />} />
+						<Route path={AppRoutes.OrderFeed} element={<OrderFeedPage />} />
+						<Route path={AppRoutes.Profile} element={<ProfilePage />} />
+						<Route path={AppRoutes.NotFound} element={<NotFoundPage />} />
+					</Routes>
 				</main>
 			</BrowserRouter>
 		</Provider>
