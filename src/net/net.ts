@@ -1,6 +1,6 @@
 import { ErrorResponse, SuccessResponse } from '../model/net/general.interface';
 
-const SERVER_URL = 'https://norma.nomoreparties.space';
+const SERVER_URL = 'https://norma.education-services.ru'; //'https://norma.nomoreparties.space';
 const REQUEST_BASE_URL = `${SERVER_URL}/api/`;
 
 export async function get<T>(endpoint: string, options?: RequestInit): Promise<T> {
