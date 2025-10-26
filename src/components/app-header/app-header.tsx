@@ -1,6 +1,8 @@
 import { Logo } from '@ya.praktikum/react-developer-burger-ui-components';
 import styles from './app-header.module.css';
 import HeaderItem from './header-item/header-item';
+import { Link } from 'react-router-dom';
+import { AppRoutes } from '../../pages/config';
 
 function AppHeader() {
 	return (
@@ -10,7 +12,9 @@ function AppHeader() {
 					<HeaderItem type="constructor" caption="Конструктор" />
 					<HeaderItem type="order" caption="Лента заказов" />
 				</div>
-				<Logo />
+				<Link to={AppRoutes.Home}>
+					<Logo />
+				</Link>
 				<HeaderItem type="account" caption="Личный кабинет" />
 			</nav>
 		</header>
