@@ -23,9 +23,7 @@ export const createOrder = createAsyncThunk<RegisterOrderResponse, string[]>(
 		const body = {
 			ingredients: ingredientIds,
 		};
-		return post<RegisterOrderResponse>('orders', {
-			body: JSON.stringify(body),
-		}).catch(error => {
+		return post<RegisterOrderResponse>('orders', body).catch(error => {
 			return thunkAPI.rejectWithValue({
 				message: error.message ?? GENERAL_ERROR_MESSAGE,
 			});

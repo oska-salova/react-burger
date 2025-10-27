@@ -7,13 +7,12 @@ export async function get<T>(endpoint: string, options?: RequestInit): Promise<T
 	return request<T>(endpoint, { ...options, method: 'GET' });
 }
 
-export async function post<T>(endpoint: string, options?: RequestInit): Promise<T> {
+export async function post<T>(endpoint: string, body?: object): Promise<T> {
 	return request<T>(endpoint, {
-		...options,
+		body: JSON.stringify(body ?? null),
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			...options?.headers,
 		},
 	});
 }

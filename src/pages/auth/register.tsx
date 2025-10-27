@@ -4,17 +4,11 @@ import {
 	Input,
 	PasswordInput,
 } from '@ya.praktikum/react-developer-burger-ui-components';
-import { ChangeEvent, PointerEvent, useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AppRoutes } from '../config';
 
 function RegisterPage() {
-	const onNamePointerEnter = (e: PointerEvent<HTMLInputElement>) => {
-		console.log('** onNamePointerEnter', e);
-	};
-	const onNamePointerLeave = (e: PointerEvent<HTMLInputElement>) => {
-		console.log('** onNamePointerLeave', e);
-	};
 	const [nameValue, setNameValue] = useState('');
 	const onNameChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setNameValue(e.target.value);
@@ -40,8 +34,8 @@ function RegisterPage() {
 				value={nameValue}
 				name="name"
 				extraClass="mb-6"
-				onPointerEnterCapture={onNamePointerEnter}
-				onPointerLeaveCapture={onNamePointerLeave}
+				onPointerEnterCapture={undefined}
+				onPointerLeaveCapture={undefined}
 			/>
 			<EmailInput
 				onChange={onLoginChange}
