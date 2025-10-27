@@ -40,7 +40,6 @@ function RegisterPage() {
 				value={nameValue}
 				name="name"
 				extraClass="mb-6"
-				icon="CurrencyIcon"
 				onPointerEnterCapture={onNamePointerEnter}
 				onPointerLeaveCapture={onNamePointerLeave}
 			/>

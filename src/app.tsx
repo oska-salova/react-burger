@@ -8,9 +8,9 @@ import OrderFeedPage from './pages/order-feed';
 import ProfilePage from './pages/profile';
 import NotFoundPage from './pages/not-found';
 import LoginPage from './pages/auth/login';
-import RegisterPage from './pages/auth/register';
 import ForgotPasswordPage from './pages/auth/forgot-password';
 import ResetPasswordPage from './pages/auth/reset-password';
+import RegisterPage from './pages/auth/register';
 
 function App() {
 	return (
