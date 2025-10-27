@@ -87,3 +87,22 @@ body {
 	justify-content: center;
 	align-items: center;
 }
+
+a {
+	text-decoration: none;
+}
+
+.login-container {
+	flex-direction: column;
+	gap: 0;
+	min-width: 480px;
+	min-height: 430px;
+}
+
+.login-action {
+	display: flex;
+	flex-direction: row;
+	gap: 8px;
+	flex-wrap: nowrap;
+	align-items: center;
+}
