@@ -4,25 +4,34 @@ import {
 	Input,
 	PasswordInput,
 } from '@ya.praktikum/react-developer-burger-ui-components';
-import { ChangeEvent, FormEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AppRoutes } from '../config';
+import { useAppDispatch, useAppSelector } from '../../services/store';
+import { registerUser } from '../../services/auth';
 
 function RegisterPage() {
+	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
-	const [isLoading, setIsLoading] = useState(false);
+	const userState = useAppSelector(state => state.authReducer);
 
-	const [form, setFormValue] = useState({ name: '', login: '', password: '' });
+	const [form, setFormValue] = useState({ name: '', email: '', password: '' });
 	const onChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setFormValue({ ...form, [e.target.name]: e.target.value });
 	};
 
 	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		// setIsLoading(true);
+		dispatch(registerUser(form));
 	};
 
-	const isSubmitAvailable = Object.values(form).every(value => !!value) && !isLoading;
+	const isSubmitAvailable = Object.values(form).every(value => !!value) && !userState.pending;
+
+	useEffect(() => {
+		if (userState.user) {
+			navigate(AppRoutes.Login);
+		}
+	}, [userState]);
 
 	return (
 		<form className="flex-center login-container" onSubmit={handleSubmit}>
@@ -39,8 +48,8 @@ function RegisterPage() {
 			/>
 			<EmailInput
 				onChange={onChange}
-				value={form.login}
-				name="login"
+				value={form.email}
+				name="email"
 				isIcon={false}
 				extraClass="mb-6"
 			/>
@@ -59,6 +68,9 @@ function RegisterPage() {
 			>
 				Зарегистрироваться
 			</Button>
+			{userState.error && (
+				<p className="text text_type_main-default text_color_error">{userState.error}</p>
+			)}
 			<div className="login-action mb-4">
 				<p className="text text_type_main-default text_color_inactive">
 					Уже зарегистрированы?
