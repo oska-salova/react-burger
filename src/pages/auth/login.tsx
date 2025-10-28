@@ -11,33 +11,31 @@ function LoginPage() {
 	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState(false);
 
-	const [loginValue, setLoginValue] = useState('');
-	const onLoginChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setLoginValue(e.target.value);
-	};
-
-	const [passwordValue, setPasswordValue] = useState('');
-	const onPasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setPasswordValue(e.target.value);
+	const [form, setFormValue] = useState({ login: '', password: '' });
+	const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+		setFormValue({ ...form, [e.target.name]: e.target.value });
 	};
 
 	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
+		// setIsLoading(true);
 	};
+
+	const isSubmitAvailable = Object.values(form).every(value => !!value) && !isLoading;
 
 	return (
 		<form className="flex-center login-container" onSubmit={handleSubmit}>
 			<p className="text text_type_main-default mb-6">Вход</p>
 			<EmailInput
-				onChange={onLoginChange}
-				value={loginValue}
+				onChange={onChange}
+				value={form.login}
 				name="login"
 				isIcon={false}
 				extraClass="mb-6"
 			/>
 			<PasswordInput
-				onChange={onPasswordChange}
-				value={passwordValue}
+				onChange={onChange}
+				value={form.password}
 				name="password"
 				extraClass="mb-6"
 			/>
@@ -46,7 +44,7 @@ function LoginPage() {
 				type="primary"
 				size="medium"
 				extraClass="mb-20"
-				disabled={isLoading || !loginValue || !passwordValue}
+				disabled={!isSubmitAvailable}
 			>
 				Войти
 			</Button>

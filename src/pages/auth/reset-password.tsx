@@ -8,21 +8,15 @@ function ResetPasswordPage() {
 	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState(false);
 
-	const [codeValue, setCodeValue] = useState('');
-	const onCodeChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setCodeValue(e.target.value);
-	};
-
-	const [passwordValue, setPasswordValue] = useState('');
-	const onPasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setPasswordValue(e.target.value);
+	const [form, setFormValue] = useState({ password: '', token: '' });
+	const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+		setFormValue({ ...form, [e.target.name]: e.target.value });
 	};
 
 	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		setIsLoading(true);
-		const requestBody = { password: passwordValue, token: codeValue };
-		resetPassword(requestBody, 'restore')
+		resetPassword(form, 'restore')
 			.then((success: boolean) => {
 				success && navigate(AppRoutes.Login);
 			})
@@ -31,22 +25,24 @@ function ResetPasswordPage() {
 			});
 	};
 
+	const isSubmitAvailable = Object.values(form).every(value => !!value) && !isLoading;
+
 	return (
 		<form className="flex-center login-container" onSubmit={handleSubmit}>
 			<p className="text text_type_main-default mb-6">Восстановление пароля</p>
 			<PasswordInput
 				placeholder="Введите новый пароль"
-				onChange={onPasswordChange}
-				value={passwordValue}
+				onChange={onChange}
+				value={form.password}
 				name="password"
 				extraClass="mb-6"
 			/>
 			<Input
 				type="text"
 				placeholder="Введите код из письма"
-				onChange={onCodeChange}
-				value={codeValue}
-				name="name"
+				onChange={onChange}
+				value={form.token}
+				name="token"
 				extraClass="mb-6"
 				onPointerEnterCapture={undefined}
 				onPointerLeaveCapture={undefined}
@@ -56,7 +52,7 @@ function ResetPasswordPage() {
 				type="primary"
 				size="medium"
 				extraClass="mb-20"
-				disabled={isLoading || !passwordValue || !codeValue}
+				disabled={!isSubmitAvailable}
 			>
 				Восстановить
 			</Button>

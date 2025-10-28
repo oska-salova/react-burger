@@ -7,16 +7,15 @@ import { resetPassword } from '../../net/api';
 function ForgotPasswordPage() {
 	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState(false);
-	const [loginValue, setLoginValue] = useState('');
-	const onLoginChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setLoginValue(e.target.value);
-	};
 
+	const [form, setFormValue] = useState({ email: '' });
+	const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+		setFormValue({ ...form, [e.target.name]: e.target.value });
+	};
 	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		setIsLoading(true);
-		const requestBody = { email: loginValue };
-		resetPassword(requestBody, 'reset')
+		resetPassword(form, 'reset')
 			.then((success: boolean) => {
 				success && navigate(AppRoutes.ResetPassword);
 			})
@@ -25,14 +24,16 @@ function ForgotPasswordPage() {
 			});
 	};
 
+	const isSubmitAvailable = Object.values(form).every(value => !!value) && !isLoading;
+
 	return (
 		<form className="flex-center login-container" onSubmit={handleSubmit}>
 			<p className="text text_type_main-default mb-6">Восстановление пароля</p>
 			<EmailInput
 				placeholder="Укажите e-mail"
-				onChange={onLoginChange}
-				value={loginValue}
-				name="login"
+				onChange={onChange}
+				value={form.email}
+				name="email"
 				isIcon={false}
 				extraClass="mb-6"
 			/>
@@ -41,7 +42,7 @@ function ForgotPasswordPage() {
 				type="primary"
 				size="medium"
 				extraClass="mb-20"
-				disabled={isLoading || !loginValue}
+				disabled={!isSubmitAvailable}
 			>
 				Восстановить
 			</Button>

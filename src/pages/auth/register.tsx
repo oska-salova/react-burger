@@ -12,19 +12,9 @@ function RegisterPage() {
 	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState(false);
 
-	const [nameValue, setNameValue] = useState('');
-	const onNameChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setNameValue(e.target.value);
-	};
-
-	const [loginValue, setLoginValue] = useState('');
-	const onLoginChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setLoginValue(e.target.value);
-	};
-
-	const [passwordValue, setPasswordValue] = useState('');
-	const onPasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setPasswordValue(e.target.value);
+	const [form, setFormValue] = useState({ name: '', login: '', password: '' });
+	const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+		setFormValue({ ...form, [e.target.name]: e.target.value });
 	};
 
 	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -32,29 +22,31 @@ function RegisterPage() {
 		// setIsLoading(true);
 	};
 
+	const isSubmitAvailable = Object.values(form).every(value => !!value) && !isLoading;
+
 	return (
 		<form className="flex-center login-container" onSubmit={handleSubmit}>
 			<p className="text text_type_main-default mb-6">Регистрация</p>
 			<Input
 				type="text"
 				placeholder="Имя"
-				onChange={onNameChange}
-				value={nameValue}
+				onChange={onChange}
+				value={form.name}
 				name="name"
 				extraClass="mb-6"
 				onPointerEnterCapture={undefined}
 				onPointerLeaveCapture={undefined}
 			/>
 			<EmailInput
-				onChange={onLoginChange}
-				value={loginValue}
+				onChange={onChange}
+				value={form.login}
 				name="login"
 				isIcon={false}
 				extraClass="mb-6"
 			/>
 			<PasswordInput
-				onChange={onPasswordChange}
-				value={passwordValue}
+				onChange={onChange}
+				value={form.password}
 				name="password"
 				extraClass="mb-6"
 			/>
@@ -63,7 +55,7 @@ function RegisterPage() {
 				type="primary"
 				size="medium"
 				extraClass="mb-20"
-				disabled={isLoading || !loginValue || !nameValue || !passwordValue}
+				disabled={!isSubmitAvailable}
 			>
 				Зарегистрироваться
 			</Button>
