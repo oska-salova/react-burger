@@ -15,7 +15,8 @@ function ForgotPasswordPage() {
 	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		setIsLoading(true);
-		resetPassword(loginValue)
+		const requestBody = { email: loginValue };
+		resetPassword(requestBody, 'reset')
 			.then((success: boolean) => {
 				success && navigate(AppRoutes.ResetPassword);
 			})
@@ -40,7 +41,7 @@ function ForgotPasswordPage() {
 				type="primary"
 				size="medium"
 				extraClass="mb-20"
-				disabled={!loginValue || isLoading}
+				disabled={isLoading || !loginValue}
 			>
 				Восстановить
 			</Button>

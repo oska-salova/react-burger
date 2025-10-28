@@ -1,9 +1,13 @@
 import { Button, Input, PasswordInput } from '@ya.praktikum/react-developer-burger-ui-components';
-import { ChangeEvent, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { ChangeEvent, FormEvent, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { AppRoutes } from '../config';
+import { resetPassword } from '../../net/api';
 
 function ResetPasswordPage() {
+	const navigate = useNavigate();
+	const [isLoading, setIsLoading] = useState(false);
+
 	const [codeValue, setCodeValue] = useState('');
 	const onCodeChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setCodeValue(e.target.value);
@@ -14,8 +18,21 @@ function ResetPasswordPage() {
 		setPasswordValue(e.target.value);
 	};
 
+	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		setIsLoading(true);
+		const requestBody = { password: passwordValue, token: codeValue };
+		resetPassword(requestBody, 'restore')
+			.then((success: boolean) => {
+				success && navigate(AppRoutes.Login);
+			})
+			.finally(() => {
+				setIsLoading(false);
+			});
+	};
+
 	return (
-		<div className="flex-center login-container">
+		<form className="flex-center login-container" onSubmit={handleSubmit}>
 			<p className="text text_type_main-default mb-6">Восстановление пароля</p>
 			<PasswordInput
 				placeholder="Введите новый пароль"
@@ -34,7 +51,13 @@ function ResetPasswordPage() {
 				onPointerEnterCapture={undefined}
 				onPointerLeaveCapture={undefined}
 			/>
-			<Button htmlType="submit" type="primary" size="medium" extraClass="mb-20">
+			<Button
+				htmlType="submit"
+				type="primary"
+				size="medium"
+				extraClass="mb-20"
+				disabled={isLoading || !passwordValue || !codeValue}
+			>
 				Восстановить
 			</Button>
 			<div className="login-action mb-4">
@@ -43,7 +66,7 @@ function ResetPasswordPage() {
 					<p className="text text_type_main-default text_color_accent">Войти</p>
 				</Link>
 			</div>
-		</div>
+		</form>
 	);
 }
 

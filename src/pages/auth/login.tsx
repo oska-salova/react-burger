@@ -3,11 +3,14 @@ import {
 	EmailInput,
 	PasswordInput,
 } from '@ya.praktikum/react-developer-burger-ui-components';
-import { ChangeEvent, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { ChangeEvent, FormEvent, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { AppRoutes } from '../config';
 
 function LoginPage() {
+	const navigate = useNavigate();
+	const [isLoading, setIsLoading] = useState(false);
+
 	const [loginValue, setLoginValue] = useState('');
 	const onLoginChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setLoginValue(e.target.value);
@@ -18,8 +21,12 @@ function LoginPage() {
 		setPasswordValue(e.target.value);
 	};
 
+	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+	};
+
 	return (
-		<div className="flex-center login-container">
+		<form className="flex-center login-container" onSubmit={handleSubmit}>
 			<p className="text text_type_main-default mb-6">Вход</p>
 			<EmailInput
 				onChange={onLoginChange}
@@ -34,7 +41,13 @@ function LoginPage() {
 				name="password"
 				extraClass="mb-6"
 			/>
-			<Button htmlType="submit" type="primary" size="medium" extraClass="mb-20">
+			<Button
+				htmlType="submit"
+				type="primary"
+				size="medium"
+				extraClass="mb-20"
+				disabled={isLoading || !loginValue || !passwordValue}
+			>
 				Войти
 			</Button>
 			<div className="login-action mb-4">
@@ -55,7 +68,7 @@ function LoginPage() {
 					</p>
 				</Link>
 			</div>
-		</div>
+		</form>
 	);
 }
 

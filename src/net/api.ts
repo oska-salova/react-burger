@@ -1,7 +1,13 @@
 import { post } from './net';
 
-export async function resetPassword(email: string): Promise<boolean> {
-	return post('password-reset', { email: email })
+type ResetPasswordRequestBody = { email: string } | { password: string; token: string };
+
+export async function resetPassword(
+	data: ResetPasswordRequestBody,
+	step: 'reset' | 'restore',
+): Promise<boolean> {
+	const endpoint = step === 'reset' ? 'password-reset' : 'password-reset/reset';
+	return post(endpoint, data)
 		.then(() => {
 			return true;
 		})
