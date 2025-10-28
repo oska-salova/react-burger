@@ -3,33 +3,42 @@ import {
 	EmailInput,
 	PasswordInput,
 } from '@ya.praktikum/react-developer-burger-ui-components';
-import { ChangeEvent, FormEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AppRoutes } from '../config';
+import { logIn } from '../../services/auth';
+import { useAppDispatch, useAppSelector } from '../../services/store';
 
 function LoginPage() {
+	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
-	const [isLoading, setIsLoading] = useState(false);
+	const authState = useAppSelector(state => state.authReducer);
 
-	const [form, setFormValue] = useState({ login: '', password: '' });
+	const [form, setFormValue] = useState({ email: '', password: '' });
 	const onChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setFormValue({ ...form, [e.target.name]: e.target.value });
 	};
 
 	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		// setIsLoading(true);
+		dispatch(logIn(form));
 	};
 
-	const isSubmitAvailable = Object.values(form).every(value => !!value) && !isLoading;
+	const isSubmitAvailable = Object.values(form).every(value => !!value) && !authState.pending;
+
+	useEffect(() => {
+		if (authState.isAuthenticated) {
+			navigate(AppRoutes.Home);
+		}
+	}, [authState]);
 
 	return (
 		<form className="flex-center login-container" onSubmit={handleSubmit}>
 			<p className="text text_type_main-default mb-6">Вход</p>
 			<EmailInput
 				onChange={onChange}
-				value={form.login}
-				name="login"
+				value={form.email}
+				name="email"
 				isIcon={false}
 				extraClass="mb-6"
 			/>
@@ -48,6 +57,9 @@ function LoginPage() {
 			>
 				Войти
 			</Button>
+			{authState.error && (
+				<p className="text text_type_main-default text_color_error">{authState.error}</p>
+			)}
 			<div className="login-action mb-4">
 				<p className="text text_type_main-default text_color_inactive">
 					Вы — новый пользователь?

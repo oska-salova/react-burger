@@ -1,32 +1,35 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { post } from '../net/net';
-import { RegisterUserResponse } from '../model/net/auth.interface';
-import { User } from '../model/user';
+import { LogInRequest, LogInResponse } from '../model/net/auth.interface';
+import { userSlice } from './user';
 
-type UserState = {
-	user: User | null;
+type AuthState = {
+	isAuthenticated: boolean;
 	pending: boolean;
 	error: string | null;
 };
 
-const initialState: UserState = {
-	user: null,
+const initialState: AuthState = {
+	isAuthenticated: false,
 	pending: false,
 	error: null,
 };
 
-const GENERAL_ERROR_MESSAGE = 'An error occurred while registering the user.';
-
-export const registerUser = createAsyncThunk<
-	RegisterUserResponse,
-	{ name: string; email: string; password: string }
->('auth/register', async (registerUserInfo, thunkAPI) => {
-	return post<RegisterUserResponse>('auth/register', registerUserInfo).catch(error => {
-		return thunkAPI.rejectWithValue({
-			message: error.message ?? GENERAL_ERROR_MESSAGE,
-		});
-	});
-});
+export const logIn = createAsyncThunk<LogInResponse, LogInRequest>(
+	'auth/login',
+	async (loginInfo, thunkAPI) => {
+		return post<LogInResponse>('auth/login', loginInfo)
+			.then(response => {
+				thunkAPI.dispatch(userSlice.actions.set(response.user));
+				return response;
+			})
+			.catch(error => {
+				return thunkAPI.rejectWithValue({
+					message: error.message,
+				});
+			});
+	},
+);
 
 export const authSlice = createSlice({
 	name: 'auth',
@@ -34,19 +37,19 @@ export const authSlice = createSlice({
 	reducers: {},
 	extraReducers: builder => {
 		builder
-			.addCase(registerUser.fulfilled, (state, { payload }) => {
-				state.user = payload.user;
+			.addCase(logIn.fulfilled, state => {
+				state.isAuthenticated = true;
 				state.pending = false;
 				state.error = null;
 			})
-			.addCase(registerUser.rejected, (state, action) => {
-				state.user = null;
+			.addCase(logIn.rejected, (state, action) => {
+				state.isAuthenticated = false;
 				state.pending = false;
 				state.error =
 					(action.payload as { message: string }).message ?? 'Unexpected network error';
 			})
-			.addCase(registerUser.pending, state => {
-				state.user = null;
+			.addCase(logIn.pending, state => {
+				state.isAuthenticated = false;
 				state.pending = true;
 				state.error = null;
 			});

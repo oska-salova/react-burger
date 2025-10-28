@@ -8,12 +8,12 @@ import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AppRoutes } from '../config';
 import { useAppDispatch, useAppSelector } from '../../services/store';
-import { registerUser } from '../../services/auth';
+import { registerUser } from '../../services/user';
 
 function RegisterPage() {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
-	const userState = useAppSelector(state => state.authReducer);
+	const userState = useAppSelector(state => state.userReducer);
 
 	const [form, setFormValue] = useState({ name: '', email: '', password: '' });
 	const onChange = (e: ChangeEvent<HTMLInputElement>) => {

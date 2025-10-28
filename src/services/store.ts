@@ -4,6 +4,7 @@ import ingredientsReducer from './burger/ingredients';
 import burgerConstructorReducer from './burger/constructor';
 import currentIngredientDetailsReducer from './burger/ingredient-details';
 import orderReducer from './order';
+import userReducer from './user';
 import authReducer from './auth';
 
 export const store = configureStore({
@@ -12,6 +13,7 @@ export const store = configureStore({
 		burgerConstructorReducer,
 		currentIngredientDetailsReducer,
 		orderReducer,
+		userReducer,
 		authReducer,
 	},
 	devTools: process.env.NODE_ENV === 'development',
