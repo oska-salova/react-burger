@@ -1,6 +1,11 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { post } from '../net/net';
-import { LogInRequest, LogInResponse } from '../model/net/auth.interface';
+import {
+	LogInRequest,
+	LogInResponse,
+	LogOutRequest,
+	LogOutResponse,
+} from '../model/net/auth.interface';
 import { userSlice } from './user';
 
 type AuthState = {
@@ -31,6 +36,22 @@ export const logIn = createAsyncThunk<LogInResponse, LogInRequest>(
 	},
 );
 
+export const logOut = createAsyncThunk<LogOutResponse, LogOutRequest>(
+	'auth/logout',
+	async (logoutInfo, thunkAPI) => {
+		return post<LogOutResponse>('auth/logout', logoutInfo)
+			.then(response => {
+				thunkAPI.dispatch(userSlice.actions.delete());
+				return response;
+			})
+			.catch(error => {
+				return thunkAPI.rejectWithValue({
+					message: error.message,
+				});
+			});
+	},
+);
+
 export const authSlice = createSlice({
 	name: 'auth',
 	initialState,
@@ -50,6 +71,19 @@ export const authSlice = createSlice({
 			})
 			.addCase(logIn.pending, state => {
 				state.isAuthenticated = false;
+				state.pending = true;
+				state.error = null;
+			})
+			.addCase(logOut.fulfilled, state => {
+				state.isAuthenticated = false;
+			})
+			.addCase(logOut.rejected, (state, action) => {
+				state.isAuthenticated = false;
+				state.pending = false;
+				state.error =
+					(action.payload as { message: string }).message ?? 'Unexpected network error';
+			})
+			.addCase(logOut.pending, state => {
 				state.pending = true;
 				state.error = null;
 			});
