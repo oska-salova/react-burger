@@ -5,7 +5,7 @@ import {
 } from '@ya.praktikum/react-developer-burger-ui-components';
 import styles from './header-item.module.css';
 import { ReactElement } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { AppRoutes } from '../../../pages/config';
 
 type HeaderItemType = 'constructor' | 'order' | 'account' | undefined;
@@ -20,12 +20,17 @@ function HeaderItem(props: HeaderItemProps) {
 	const routePath = getLinkPath(props.type);
 
 	return (
-		<Link to={routePath} className={`${styles.item} p-5`}>
+		<NavLink
+			to={routePath}
+			className={({ isActive }) =>
+				`${styles.item} p-5 `.concat([isActive ? 'active' : ''].join(' '))
+			}
+		>
 			{iconElement}
 			<div className={styles.caption}>
 				<span className="text text_type_main-default">{props.caption}</span>
 			</div>
-		</Link>
+		</NavLink>
 	);
 }
 

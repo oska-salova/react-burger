@@ -90,6 +90,19 @@ body {
 
 a {
 	text-decoration: none;
+	color: var(--text-inactive-color);
+}
+
+a svg {
+	fill: var(--text-inactive-color);
+}
+
+a.active {
+	color: var(--text-primary-color);
+}
+
+a.active svg {
+	fill: var(--text-primary-color);
 }
 
 .login-container {
