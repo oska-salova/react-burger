@@ -29,9 +29,11 @@ function App() {
 					<Route path={AppRoutes.OrderFeed} element={<OrderFeedPage />} />
 					<Route path={AppRoutes.Profile} element={<ProfilePage />}>
 						<Route index element={<UserPage />} />
-						<Route path={ProfileRoutes.Orders} element={<OrderHistoryPage />}>
-							<Route path=":number" element={<OrderDetailsPage />} />
-						</Route>
+						<Route path={ProfileRoutes.Orders} element={<OrderHistoryPage />} />
+						<Route
+							path={`${ProfileRoutes.Orders}/:number`}
+							element={<OrderDetailsPage />}
+						/>
 						<Route path={AppRoutes.NotFound} element={<NotFoundPage />} />
 					</Route>
 					<Route path={AppRoutes.NotFound} element={<NotFoundPage />} />

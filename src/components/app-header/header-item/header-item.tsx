@@ -5,7 +5,7 @@ import {
 } from '@ya.praktikum/react-developer-burger-ui-components';
 import styles from './header-item.module.css';
 import { ReactElement } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { AppRoutes } from '../../../pages/config';
 
 type HeaderItemType = 'constructor' | 'order' | 'account' | undefined;
