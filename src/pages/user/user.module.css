@@ -1,0 +1,19 @@
+.page {
+	margin-top: 100px;
+	max-width: 850px;
+}
+
+.form {
+	display: flex;
+	flex-direction: column;
+	width: fit-content;
+	justify-content: center;
+	align-items: start;
+}
+
+.footer {
+	display: flex;
+	gap: 20px;
+	justify-content: end;
+	width: 100%;
+}
