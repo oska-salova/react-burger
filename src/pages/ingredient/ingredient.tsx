@@ -27,6 +27,9 @@ export const IngredientPage = () => {
 		if (foundIngredient) {
 			dispatch(currentIngredientDetailsSlice.actions.set(foundIngredient));
 		}
+		return () => {
+			dispatch(currentIngredientDetailsSlice.actions.delete());
+		};
 	}, [ingredients]);
 
 	const getLoadingView = () => {
