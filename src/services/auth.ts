@@ -39,21 +39,21 @@ export const logIn = createAsyncThunk<LogInResponse, LogInRequest>(
 	},
 );
 
-export const logOut = createAsyncThunk<LogOutResponse, LogOutRequest>(
-	'auth/logout',
-	async (logoutInfo, thunkAPI) => {
-		return post<LogOutResponse>('auth/logout', logoutInfo)
-			.then(response => {
-				thunkAPI.dispatch(userSlice.actions.delete());
-				return response;
-			})
-			.catch(error => {
-				return thunkAPI.rejectWithValue({
-					message: error.message,
-				});
+export const logOut = createAsyncThunk<LogOutResponse>('auth/logout', async (_, thunkAPI) => {
+	return post<LogOutResponse>('auth/logout', {
+		token: localStorageUtils.getRefreshToken() ?? '',
+	} as LogOutRequest)
+		.finally(() => {
+			localStorageUtils.removeAccessToken();
+			localStorageUtils.removeRefreshToken();
+			thunkAPI.dispatch(userSlice.actions.delete());
+		})
+		.catch(error => {
+			return thunkAPI.rejectWithValue({
+				message: error.message,
 			});
-	},
-);
+		});
+});
 
 export const authSlice = createSlice({
 	name: 'auth',
