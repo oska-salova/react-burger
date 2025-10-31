@@ -7,6 +7,7 @@ import {
 	LogOutResponse,
 } from '../model/net/auth.interface';
 import { userSlice } from './user';
+import { localStorageUtils } from '../model/local-stoage';
 
 type AuthState = {
 	isAuthenticated: boolean;
@@ -25,6 +26,8 @@ export const logIn = createAsyncThunk<LogInResponse, LogInRequest>(
 	async (loginInfo, thunkAPI) => {
 		return post<LogInResponse>('auth/login', loginInfo)
 			.then(response => {
+				localStorageUtils.addAccessToken(response.accessToken);
+				localStorageUtils.addRefreshToken(response.refreshToken);
 				thunkAPI.dispatch(userSlice.actions.set(response.user));
 				return response;
 			})

@@ -7,17 +7,20 @@ import {
 import { useAppDispatch, useAppSelector } from '../../services/store';
 import { ChangeEvent, FormEvent, useState } from 'react';
 import styles from './user.module.css';
+import { updateUser } from '../../services/user';
+import { UpdateUserRequest } from '../../model/net/user.interface';
 
 function UserPage() {
 	const dispatch = useAppDispatch();
 	const userState = useAppSelector(state => state.userReducer);
 	const user = userState.user;
-
-	const [form, setFormValue] = useState({
+	const forDefaultValue = {
 		name: user?.name ?? '',
 		email: user?.email ?? '',
 		password: '',
-	});
+	};
+
+	const [form, setFormValue] = useState(forDefaultValue);
 	const onChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setFormValue({ ...form, [e.target.name]: e.target.value });
 	};
@@ -27,11 +30,24 @@ function UserPage() {
 
 	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		console.log('** handle submit ', form);
-		// dispatch(registerUser(form));
+		const updateData = { ...form } as UpdateUserRequest;
+		if (user?.name === form.name) {
+			delete updateData.name;
+		}
+		if (user?.email === form.email) {
+			delete updateData.email;
+		}
+		if (!form.password) {
+			delete updateData.password;
+		}
+		dispatch(updateUser(updateData));
 	};
 
-	const isSubmitAvailable = Object.values(form).every(value => !!value) && !userState.pending;
+	const handleCancel = () => {
+		setFormValue(forDefaultValue);
+	};
+
+	const isSubmitAvailable = isUserDataModified && !userState.pending;
 
 	return (
 		<section className={`flex-center ${styles.page}`}>
@@ -73,6 +89,7 @@ function UserPage() {
 							type="secondary"
 							size="medium"
 							disabled={!isSubmitAvailable}
+							onClick={handleCancel}
 						>
 							Отмена
 						</Button>
