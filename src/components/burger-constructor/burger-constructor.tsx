@@ -113,7 +113,7 @@ function BurgerConstructor() {
 							onClick={handleOrderButtonClick}
 							disabled={orderState.registration}
 						>
-							Оформить заказ
+							{orderState.registration ? 'Оформляем ...' : 'Оформить заказ'}
 						</Button>
 					</section>
 				)}
