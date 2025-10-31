@@ -1,5 +1,5 @@
 import AppHeader from './components/app-header/app-header';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import HomePage from './pages/home/home';
 import { AppRoutes, ProfileRoutes } from './pages/config';
 import OrderFeedPage from './pages/order/order-feed';
@@ -14,14 +14,20 @@ import { store } from './services/store';
 import UserPage from './pages/user/user';
 import OrderHistoryPage from './pages/order/order-history';
 import OrderDetailsPage from './pages/order/order-details';
+import { IngredientPage } from './pages/ingredient/ingredient';
 
 function App() {
+	const location = useLocation();
 	return (
 		<Provider store={store}>
 			<AppHeader />
 			<main className="main">
 				<Routes>
 					<Route path={AppRoutes.Home} element={<HomePage />} />
+					<Route
+						path={AppRoutes.Ingredient}
+						element={location.state?.ingredientId ? <HomePage /> : <IngredientPage />}
+					/>
 					<Route path={AppRoutes.Login} element={<LoginPage />} />
 					<Route path={AppRoutes.Register} element={<RegisterPage />} />
 					<Route path={AppRoutes.ForgotPassword} element={<ForgotPasswordPage />} />

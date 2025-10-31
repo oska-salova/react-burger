@@ -8,6 +8,8 @@ import { useModal } from '../../hooks/useModal';
 import { useAppDispatch, useAppSelector } from '../../services/store';
 import { getIngredients } from '../../services/burger/ingredients';
 import { currentIngredientDetailsSlice } from '../../services/burger/ingredient-details';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { AppRoutes } from '../../pages/config';
 
 const GROUP_NAMES: Record<IngredientType, string> = {
 	[IngredientType.bun]: 'Булки',
@@ -16,18 +18,21 @@ const GROUP_NAMES: Record<IngredientType, string> = {
 };
 
 function BurgerIngredients() {
+	const location = useLocation();
 	const dispatch = useAppDispatch();
+	const navigate = useNavigate();
 	const isLoading = useAppSelector(state => state.ingredientsReducer.loading);
 	const ingredients = useAppSelector(state => state.ingredientsReducer.ingredients);
+	const error = useAppSelector(state => state.ingredientsReducer.error);
 	const selectedIngredients = useAppSelector(state => state.burgerConstructorReducer.ingredients);
 	const selectedBun = useAppSelector(state => state.burgerConstructorReducer.bun);
-	const error = useAppSelector(state => state.ingredientsReducer.error);
+	const detailsIngredient = useAppSelector(
+		state => state.currentIngredientDetailsReducer.ingredient,
+	);
 
 	useEffect(() => {
 		const controller = new AbortController();
-
 		dispatch(getIngredients(undefined, { signal: controller.signal }));
-
 		return () => {
 			controller.abort();
 		};
@@ -124,15 +129,41 @@ function BurgerIngredients() {
 		setCurrentTab(tab);
 	};
 
-	const [isModalOpen, modal, openModal] = useModal('Детали ингредиента');
+	const [isModalOpen, modal, openModal, closeModal] = useModal('Детали ингредиента');
 	const handleIngredientClick = (ingredient: BurgerIngredient) => {
 		dispatch(currentIngredientDetailsSlice.actions.set(ingredient));
-		openModal(<IngredientDetails />);
+		navigate(AppRoutes.Ingredient.replace(':id', ingredient._id), {
+			state: { ingredientId: ingredient._id },
+		});
 	};
 
 	useEffect(() => {
+		const historyIngredientId = location.state?.ingredientId;
+		if (historyIngredientId) {
+			const foundIngredient = ingredients.find(
+				ingredient => ingredient._id === historyIngredientId,
+			);
+			if (foundIngredient) {
+				dispatch(currentIngredientDetailsSlice.actions.set(foundIngredient));
+				openModal(<IngredientDetails />);
+			}
+		}
+	}, [location.state, ingredients]);
+
+	useEffect(() => {
+		const historyIngredientId = location.state?.ingredientId;
+		if (!historyIngredientId) {
+			closeModal();
+		}
+	}, [location.pathname]);
+
+	useEffect(() => {
 		if (!isModalOpen) {
-			dispatch(currentIngredientDetailsSlice.actions.delete());
+			const isIngredientViewCompleted = !!detailsIngredient;
+			if (isIngredientViewCompleted) {
+				dispatch(currentIngredientDetailsSlice.actions.delete());
+				navigate(AppRoutes.Home);
+			}
 		}
 	}, [isModalOpen]);
 

@@ -88,6 +88,10 @@ body {
 	align-items: center;
 }
 
+.flex-columns {
+	flex-direction: column;
+}
+
 a {
 	text-decoration: none;
 	color: var(--text-inactive-color);
