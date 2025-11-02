@@ -28,6 +28,7 @@ export const logIn = createAsyncThunk<LogInResponse, LogInRequest>(
 			.then(response => {
 				localStorageUtils.addAccessToken(response.accessToken);
 				localStorageUtils.addRefreshToken(response.refreshToken);
+				localStorageUtils.removeResetPassword();
 				thunkAPI.dispatch(userSlice.actions.set(response.user));
 				return response;
 			})

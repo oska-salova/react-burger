@@ -3,6 +3,7 @@ import { ChangeEvent, FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AppRoutes } from '../config';
 import { resetPassword } from '../../net/api';
+import { localStorageUtils } from '../../model/local-storage';
 
 function ForgotPasswordPage() {
 	const navigate = useNavigate();
@@ -17,6 +18,7 @@ function ForgotPasswordPage() {
 		setIsLoading(true);
 		resetPassword(form, 'reset')
 			.then((success: boolean) => {
+				localStorageUtils.addResetPassword();
 				success && navigate(AppRoutes.ResetPassword);
 			})
 			.finally(() => {

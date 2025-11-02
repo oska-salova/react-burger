@@ -1,6 +1,7 @@
 enum LocalStorageItems {
 	REFRESH_TOKEN = 'refreshToken',
 	ACCESS_TOKEN = 'accessToken',
+	RESET_PASSWORD = 'resetPassword',
 }
 
 const addAccessToken = (token: string): void => {
@@ -27,6 +28,18 @@ const getRefreshToken = (): string | null => {
 	return localStorage.getItem(LocalStorageItems.REFRESH_TOKEN);
 };
 
+const addResetPassword = (): void => {
+	localStorage.setItem(LocalStorageItems.RESET_PASSWORD, 'true');
+};
+
+const removeResetPassword = (): void => {
+	localStorage.removeItem(LocalStorageItems.RESET_PASSWORD);
+};
+
+const getResetPassword = (): string | null => {
+	return localStorage.getItem(LocalStorageItems.RESET_PASSWORD);
+};
+
 export const localStorageUtils = {
 	addAccessToken: addAccessToken,
 	removeAccessToken: removeAccessToken,
@@ -34,4 +47,7 @@ export const localStorageUtils = {
 	addRefreshToken: addRefreshToken,
 	removeRefreshToken: removeRefreshToken,
 	getRefreshToken: getRefreshToken,
+	addResetPassword: addResetPassword,
+	removeResetPassword: removeResetPassword,
+	getResetPassword: getResetPassword,
 };

@@ -30,14 +30,17 @@ function ProtectedRouteElement({ element, needsAuth }: ProtectedRouteElementProp
 				} else {
 					setRememberedPath(location.pathname);
 					navigate(AppRoutes.Login, { replace: true });
-					return;
 				}
 			}
 		} else {
 			if (isAuthenticated) {
 				navigate(rememberedPath ?? AppRoutes.Home, { replace: true });
 			} else {
-				setCanProceedNavigation(true);
+				if (accessToken) {
+					setIsGetUserRequired(true);
+				} else {
+					setCanProceedNavigation(true);
+				}
 			}
 		}
 	}, [needsAuth, isAuthenticated, accessToken]);

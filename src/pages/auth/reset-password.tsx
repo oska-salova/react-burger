@@ -1,12 +1,19 @@
 import { Button, Input, PasswordInput } from '@ya.praktikum/react-developer-burger-ui-components';
-import { ChangeEvent, FormEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AppRoutes } from '../config';
 import { resetPassword } from '../../net/api';
+import { localStorageUtils } from '../../model/local-storage';
 
 function ResetPasswordPage() {
 	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState(false);
+
+	useEffect(() => {
+		if (!localStorageUtils.getResetPassword()) {
+			navigate(AppRoutes.ForgotPassword, { replace: true });
+		}
+	}, []);
 
 	const [form, setFormValue] = useState({ password: '', token: '' });
 	const onChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -18,7 +25,10 @@ function ResetPasswordPage() {
 		setIsLoading(true);
 		resetPassword(form, 'restore')
 			.then((success: boolean) => {
-				success && navigate(AppRoutes.Login);
+				if (success) {
+					localStorageUtils.removeResetPassword();
+					navigate(AppRoutes.Login);
+				}
 			})
 			.finally(() => {
 				setIsLoading(false);
