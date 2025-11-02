@@ -40,14 +40,13 @@ async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
 	try {
 		const response: Response = await fetch(`${REQUEST_BASE_URL}${endpoint}`, options);
 		const isAuthError = response.status === 401 || response.status === 403;
-		if (isAuthError && endpoint !== 'auth/token') {
+		if (isAuthError && new Headers(options?.headers).has('Authorization')) {
 			if (!refreshPromise) {
 				refreshPromise = refreshToken();
 			}
 			try {
 				await refreshPromise;
 			} catch (error: unknown) {
-				token.removeTokens();
 				return Promise.reject(new Error('Auth error'));
 			} finally {
 				refreshPromise = null;

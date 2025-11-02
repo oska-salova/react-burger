@@ -24,7 +24,16 @@ export async function refreshToken(): Promise<RefreshTokenResponse> {
 	if (!refreshToken) {
 		return Promise.reject(new Error('No refresh token.'));
 	}
-	return post<RefreshTokenResponse>('auth/token', { token: refreshToken }).then(response => {
-		return response;
-	});
+	return post<RefreshTokenResponse>('auth/token', { token: refreshToken })
+		.then(response => {
+			token.setTokens({
+				accessToken: response.accessToken,
+				refreshToken: response.refreshToken,
+			});
+			return response;
+		})
+		.catch((error: unknown) => {
+			token.removeTokens();
+			throw error;
+		});
 }

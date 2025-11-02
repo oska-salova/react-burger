@@ -77,9 +77,11 @@ export const userSlice = createSlice({
 	reducers: {
 		set(state, action: PayloadAction<User>) {
 			state.user = action.payload;
+			state.error = null;
 		},
 		delete(state) {
 			state.user = null;
+			state.error = null;
 		},
 	},
 	extraReducers: builder => {

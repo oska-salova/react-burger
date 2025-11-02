@@ -8,6 +8,8 @@ type TokensType = {
 	refreshToken: string;
 };
 
+export const TOKEN_REMOVED_EVENT = 'tokenRemoved';
+
 const setTokens = (tokens: TokensType): void => {
 	localStorage.setItem(LocalStorageItems.ACCESS_TOKEN, tokens.accessToken);
 	localStorage.setItem(LocalStorageItems.REFRESH_TOKEN, tokens.refreshToken);
@@ -16,6 +18,7 @@ const setTokens = (tokens: TokensType): void => {
 const removeTokens = (): void => {
 	localStorage.removeItem(LocalStorageItems.ACCESS_TOKEN);
 	localStorage.removeItem(LocalStorageItems.REFRESH_TOKEN);
+	window.dispatchEvent(new Event(TOKEN_REMOVED_EVENT));
 };
 
 const getAccessToken = (): string | null => {

@@ -19,6 +19,7 @@ import { ReactElement, useEffect, useState } from 'react';
 import { getUser } from './services/user';
 import { token } from './model/token';
 import { burgerConstructorSlice } from './services/burger/constructor';
+import { orderSlice } from './services/order';
 
 function App() {
 	const location = useLocation();
@@ -59,6 +60,12 @@ function App() {
 			dispatch(burgerConstructorSlice.actions.clear());
 		}
 	}, [location.pathname, orderState.registration, orderState.preRegistration]);
+
+	useEffect(() => {
+		if (orderState.error || orderState.order) {
+			dispatch(orderSlice.actions.reset());
+		}
+	}, [location.pathname]);
 
 	if (!isUserChecked) {
 		return <p className="text text_type_main-default">User data preparing...</p>;

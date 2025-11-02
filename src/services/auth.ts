@@ -7,10 +7,11 @@ import {
 	LogOutResponse,
 } from '../model/net/auth.interface';
 import { userSlice } from './user';
-import { token } from '../model/token';
+import { token, TOKEN_REMOVED_EVENT } from '../model/token';
 import { password } from '../model/password';
 import { orderSlice } from './order';
 import { burgerConstructorSlice } from './burger/constructor';
+import { store } from './store';
 
 type AuthState = {
 	isAuthenticated: boolean;
@@ -23,6 +24,11 @@ const initialState: AuthState = {
 	pending: false,
 	error: null,
 };
+
+window.addEventListener(TOKEN_REMOVED_EVENT, () => {
+	store.dispatch(authSlice.actions.setAuth(false));
+	store.dispatch(userSlice.actions.delete());
+});
 
 export const logIn = createAsyncThunk<LogInResponse, LogInRequest>(
 	'auth/login',
@@ -51,7 +57,6 @@ export const logOut = createAsyncThunk<LogOutResponse>('auth/logout', async (_, 
 	} as LogOutRequest)
 		.finally(() => {
 			token.removeTokens();
-			thunkAPI.dispatch(userSlice.actions.delete());
 			thunkAPI.dispatch(orderSlice.actions.reset());
 			thunkAPI.dispatch(burgerConstructorSlice.actions.clear());
 		})
@@ -93,11 +98,10 @@ export const authSlice = createSlice({
 				state.pending = false;
 				state.error = null;
 			})
-			.addCase(logOut.rejected, (state, action) => {
+			.addCase(logOut.rejected, state => {
 				state.isAuthenticated = false;
 				state.pending = false;
-				state.error =
-					(action.payload as { message: string }).message ?? 'Unexpected network error';
+				state.error = null;
 			})
 			.addCase(logOut.pending, state => {
 				state.pending = true;

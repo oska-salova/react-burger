@@ -1,6 +1,6 @@
 import { Button, CurrencyIcon } from '@ya.praktikum/react-developer-burger-ui-components';
 import styles from './burger-constructor.module.css';
-import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from '../../hooks/useModal';
 import OrderDetails from '../order/order-details/order-details';
 import { useAppDispatch, useAppSelector } from '../../services/store';
@@ -21,6 +21,7 @@ function BurgerConstructor() {
 	const customIngredients = useAppSelector(state => state.burgerConstructorReducer.ingredients);
 	const orderState = useAppSelector(state => state.orderReducer);
 	const isAuthenticated = useAppSelector(state => state.authReducer.isAuthenticated);
+	const [isCreateOrderResultViewed, setCreateOrderResultViewed] = useState(false);
 
 	const customIngredientsRef = useRef<HTMLUListElement | null>(null);
 	const [isModalOpen, modal, openModal] = useModal('', <OrderDetails />);
@@ -62,6 +63,7 @@ function BurgerConstructor() {
 
 	const handleOrderButtonClick = () => {
 		if (bun) {
+			setCreateOrderResultViewed(false);
 			dispatch(orderSlice.actions.initRegistration());
 			if (!isAuthenticated) {
 				navigate(AppRoutes.Login);
@@ -88,10 +90,14 @@ function BurgerConstructor() {
 	}, [orderState]);
 
 	useEffect(() => {
-		if (!isModalOpen && (orderState.error || orderState.order)) {
-			dispatch(orderSlice.actions.reset());
+		if (isModalOpen && (orderState.error || orderState.order)) {
+			setCreateOrderResultViewed(true);
 		}
-	}, [isModalOpen, orderState]);
+		if (isCreateOrderResultViewed && !isModalOpen && (orderState.error || orderState.order)) {
+			dispatch(orderSlice.actions.reset());
+			setCreateOrderResultViewed(false);
+		}
+	}, [isModalOpen, orderState, isCreateOrderResultViewed]);
 
 	if (!ingredients.length) {
 		return null;
