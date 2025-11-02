@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../services/store';
 import { ReactElement, useEffect, useState } from 'react';
 import { AppRoutes } from '../pages/config';
-import { localStorageUtils } from '../model/local-storage';
+import { token } from '../model/token';
 import { getUser } from '../services/user';
 
 interface ProtectedRouteElementProps {
@@ -15,7 +15,7 @@ function ProtectedRouteElement({ element, needsAuth }: ProtectedRouteElementProp
 	const isAuthenticated = useAppSelector(state => state.authReducer.isAuthenticated);
 	const navigate = useNavigate();
 	const [canProceedNavigation, setCanProceedNavigation] = useState(false);
-	const accessToken = localStorageUtils.getAccessToken();
+	const accessToken = token.getAccessToken();
 	const [isGetUserRequired, setIsGetUserRequired] = useState(false);
 	const location = useLocation();
 	const [rememberedPath, setRememberedPath] = useState<string | undefined>(undefined);

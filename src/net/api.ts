@@ -1,4 +1,4 @@
-import { localStorageUtils } from '../model/local-storage';
+import { token } from '../model/token';
 import { RefreshTokenResponse } from '../model/net/auth.interface';
 import { post } from './net';
 
@@ -20,13 +20,11 @@ export async function resetPassword(
 }
 
 export async function refreshToken(): Promise<RefreshTokenResponse> {
-	const refreshToken = localStorageUtils.getRefreshToken();
+	const refreshToken = token.getRefreshToken();
 	if (!refreshToken) {
 		return Promise.reject(new Error('No refresh token.'));
 	}
 	return post<RefreshTokenResponse>('auth/token', { token: refreshToken }).then(response => {
-		localStorageUtils.addAccessToken(response.accessToken);
-		localStorageUtils.addRefreshToken(response.refreshToken);
 		return response;
 	});
 }

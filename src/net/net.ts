@@ -1,4 +1,4 @@
-import { localStorageUtils } from '../model/local-storage';
+import { token } from '../model/token';
 import { RefreshTokenResponse } from '../model/net/auth.interface';
 import { ErrorResponse, SuccessResponse } from '../model/net/general.interface';
 import { refreshToken } from './api';
@@ -47,8 +47,7 @@ async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
 			try {
 				await refreshPromise;
 			} catch (error: unknown) {
-				localStorageUtils.removeAccessToken();
-				localStorageUtils.removeRefreshToken();
+				token.removeTokens();
 				return Promise.reject(new Error('Auth error'));
 			} finally {
 				refreshPromise = null;
@@ -95,7 +94,7 @@ function addAuthHeader(endpoint: string, options: RequestInit): RequestInit {
 
 	const headers = new Headers(options.headers);
 	headers.delete('Authorization');
-	headers.append('Authorization', localStorageUtils.getAccessToken() ?? '');
+	headers.append('Authorization', token.getAccessToken() ?? '');
 
 	return { ...options, headers };
 }

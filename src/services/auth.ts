@@ -7,7 +7,8 @@ import {
 	LogOutResponse,
 } from '../model/net/auth.interface';
 import { userSlice } from './user';
-import { localStorageUtils } from '../model/local-storage';
+import { token } from '../model/token';
+import { password } from '../model/password';
 
 type AuthState = {
 	isAuthenticated: boolean;
@@ -26,9 +27,11 @@ export const logIn = createAsyncThunk<LogInResponse, LogInRequest>(
 	async (loginInfo, thunkAPI) => {
 		return post<LogInResponse>('auth/login', loginInfo)
 			.then(response => {
-				localStorageUtils.addAccessToken(response.accessToken);
-				localStorageUtils.addRefreshToken(response.refreshToken);
-				localStorageUtils.removeResetPassword();
+				token.setTokens({
+					accessToken: response.accessToken,
+					refreshToken: response.refreshToken,
+				});
+				password.disableReset();
 				thunkAPI.dispatch(userSlice.actions.set(response.user));
 				return response;
 			})
@@ -42,11 +45,10 @@ export const logIn = createAsyncThunk<LogInResponse, LogInRequest>(
 
 export const logOut = createAsyncThunk<LogOutResponse>('auth/logout', async (_, thunkAPI) => {
 	return post<LogOutResponse>('auth/logout', {
-		token: localStorageUtils.getRefreshToken() ?? '',
+		token: token.getRefreshToken() ?? '',
 	} as LogOutRequest)
 		.finally(() => {
-			localStorageUtils.removeAccessToken();
-			localStorageUtils.removeRefreshToken();
+			token.removeTokens();
 			thunkAPI.dispatch(userSlice.actions.delete());
 		})
 		.catch(error => {

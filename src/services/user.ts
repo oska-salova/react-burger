@@ -8,8 +8,8 @@ import {
 	UpdateUserResponse,
 } from '../model/net/user.interface';
 import { User } from '../model/user';
-import { localStorageUtils } from '../model/local-storage';
 import { authSlice } from './auth';
+import { token } from '../model/token';
 
 type UserState = {
 	user: User | null;
@@ -28,8 +28,10 @@ export const registerUser = createAsyncThunk<RegisterUserResponse, RegisterUserR
 	async (registerUserInfo, thunkAPI) => {
 		return post<RegisterUserResponse>('auth/register', registerUserInfo)
 			.then(response => {
-				localStorageUtils.addAccessToken(response.accessToken);
-				localStorageUtils.addRefreshToken(response.refreshToken);
+				token.setTokens({
+					accessToken: response.accessToken,
+					refreshToken: response.refreshToken,
+				});
 				thunkAPI.dispatch(authSlice.actions.setAuth(true));
 				return response;
 			})
@@ -60,8 +62,7 @@ export const updateUser = createAsyncThunk<UpdateUserResponse, UpdateUserRequest
 	'user/update',
 	async (updateUserInfo, thunkAPI) => {
 		return patch<GetUserResponse>('auth/user', updateUserInfo).catch(error => {
-			localStorageUtils.removeAccessToken();
-			localStorageUtils.removeRefreshToken();
+			token.removeTokens();
 			thunkAPI.dispatch(authSlice.actions.setAuth(false));
 			return thunkAPI.rejectWithValue({
 				message: error.message,
