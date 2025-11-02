@@ -18,6 +18,7 @@ import ProtectedRouteElement from './components/protected-route';
 import { ReactElement, useEffect, useState } from 'react';
 import { getUser } from './services/user';
 import { token } from './model/token';
+import { burgerConstructorSlice } from './services/burger/constructor';
 
 function App() {
 	const location = useLocation();
@@ -25,6 +26,7 @@ function App() {
 	const userState = useAppSelector(state => state.userReducer);
 	const accessToken = token.getAccessToken();
 	const [isUserChecked, setIsUserChecked] = useState(false);
+	const orderState = useAppSelector(state => state.orderReducer);
 
 	const getProtectedRouteElement = (element: ReactElement, needsAuth: boolean): ReactElement => {
 		return <ProtectedRouteElement element={element} needsAuth={needsAuth} />;
@@ -49,6 +51,14 @@ function App() {
 			setIsUserChecked(true);
 		}
 	}, [userState.error, userState.user]);
+
+	useEffect(() => {
+		if (orderState.preRegistration || orderState.registration) {
+			// should not clear burger
+		} else {
+			dispatch(burgerConstructorSlice.actions.clear());
+		}
+	}, [location.pathname, orderState.registration, orderState.preRegistration]);
 
 	if (!isUserChecked) {
 		return <p className="text text_type_main-default">User data preparing...</p>;

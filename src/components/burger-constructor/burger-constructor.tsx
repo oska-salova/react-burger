@@ -9,18 +9,18 @@ import ConstructorFilling from './constructor-filling/constructor-filling';
 import { useDrop } from 'react-dnd';
 import { DragIngredient, IngredientDropType } from '../../model/burger';
 import { burgerConstructorSlice } from '../../services/burger/constructor';
-import { createOrder } from '../../services/order';
+import { createOrder, orderSlice } from '../../services/order';
 import { useNavigate } from 'react-router-dom';
 import { AppRoutes } from '../../pages/config';
 
 function BurgerConstructor() {
 	const dispatch = useAppDispatch();
+	const navigate = useNavigate();
 	const ingredients = useAppSelector(state => state.ingredientsReducer.ingredients);
 	const bun = useAppSelector(state => state.burgerConstructorReducer.bun);
 	const customIngredients = useAppSelector(state => state.burgerConstructorReducer.ingredients);
 	const orderState = useAppSelector(state => state.orderReducer);
 	const isAuthenticated = useAppSelector(state => state.authReducer.isAuthenticated);
-	const navigate = useNavigate();
 
 	const customIngredientsRef = useRef<HTMLUListElement | null>(null);
 	const [isModalOpen, modal, openModal] = useModal('', <OrderDetails />);
@@ -62,6 +62,7 @@ function BurgerConstructor() {
 
 	const handleOrderButtonClick = () => {
 		if (bun) {
+			dispatch(orderSlice.actions.initRegistration());
 			if (!isAuthenticated) {
 				navigate(AppRoutes.Login);
 				return;
@@ -85,6 +86,12 @@ function BurgerConstructor() {
 			}
 		}
 	}, [orderState]);
+
+	useEffect(() => {
+		if (!isModalOpen && (orderState.error || orderState.order)) {
+			dispatch(orderSlice.actions.reset());
+		}
+	}, [isModalOpen, orderState]);
 
 	if (!ingredients.length) {
 		return null;

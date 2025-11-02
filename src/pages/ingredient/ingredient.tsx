@@ -33,7 +33,7 @@ export const IngredientPage = () => {
 	}, [ingredients]);
 
 	const getLoadingView = () => {
-		return <p className="text text_type_main-default m-2">Loading...</p>;
+		return <p className="text text_type_main-default m-2">Ingredient page: loading......</p>;
 	};
 
 	const getErrorView = () => {

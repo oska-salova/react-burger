@@ -168,7 +168,7 @@ function BurgerIngredients() {
 	}, [isModalOpen]);
 
 	if (isLoading) {
-		return <p className="text text_type_main-default m-2">Loading...</p>;
+		return <p className="text text_type_main-default m-2">BurgerIngredients: loading...</p>;
 	}
 
 	if (error) {
