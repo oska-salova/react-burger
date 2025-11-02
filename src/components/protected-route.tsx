@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../services/store';
 import { ReactElement, useEffect, useState } from 'react';
 import { AppRoutes } from '../pages/config';
@@ -17,6 +17,8 @@ function ProtectedRouteElement({ element, needsAuth }: ProtectedRouteElementProp
 	const [canProceedNavigation, setCanProceedNavigation] = useState(false);
 	const accessToken = localStorageUtils.getAccessToken();
 	const [isGetUserRequired, setIsGetUserRequired] = useState(false);
+	const location = useLocation();
+	const [rememberedPath, setRememberedPath] = useState<string | undefined>(undefined);
 
 	useEffect(() => {
 		if (needsAuth) {
@@ -26,13 +28,14 @@ function ProtectedRouteElement({ element, needsAuth }: ProtectedRouteElementProp
 				if (accessToken) {
 					setIsGetUserRequired(true);
 				} else {
+					setRememberedPath(location.pathname);
 					navigate(AppRoutes.Login, { replace: true });
 					return;
 				}
 			}
 		} else {
 			if (isAuthenticated) {
-				navigate(AppRoutes.Home, { replace: true });
+				navigate(rememberedPath ?? AppRoutes.Home, { replace: true });
 			} else {
 				setCanProceedNavigation(true);
 			}
@@ -40,10 +43,13 @@ function ProtectedRouteElement({ element, needsAuth }: ProtectedRouteElementProp
 	}, [needsAuth, isAuthenticated, accessToken]);
 
 	useEffect(() => {
-		const controller = new AbortController();
-		dispatch(getUser(undefined, { signal: controller.signal }));
+		let controller: AbortController | null = null;
+		if (isGetUserRequired) {
+			controller = new AbortController();
+			dispatch(getUser(undefined, { signal: controller.signal }));
+		}
 		return () => {
-			controller.abort();
+			controller?.abort();
 		};
 	}, [isGetUserRequired]);
 

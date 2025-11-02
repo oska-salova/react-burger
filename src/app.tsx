@@ -16,9 +16,14 @@ import OrderHistoryPage from './pages/order/order-history';
 import OrderDetailsPage from './pages/order/order-details';
 import { IngredientPage } from './pages/ingredient/ingredient';
 import ProtectedRouteElement from './components/protected-route';
+import { ReactElement } from 'react';
 
 function App() {
 	const location = useLocation();
+
+	const getProtectedRouteElement = (element: ReactElement, needsAuth: boolean): ReactElement => {
+		return <ProtectedRouteElement element={element} needsAuth={needsAuth} />;
+	};
 	return (
 		<Provider store={store}>
 			<AppHeader />
@@ -31,40 +36,27 @@ function App() {
 					/>
 					<Route
 						path={AppRoutes.Login}
-						element={
-							<ProtectedRouteElement element={<LoginPage />} needsAuth={false} />
-						}
+						element={getProtectedRouteElement(<LoginPage />, false)}
 					/>
 					<Route
 						path={AppRoutes.Register}
-						element={
-							<ProtectedRouteElement element={<RegisterPage />} needsAuth={false} />
-						}
+						element={getProtectedRouteElement(<RegisterPage />, false)}
 					/>
 					<Route
 						path={AppRoutes.ForgotPassword}
-						element={
-							<ProtectedRouteElement
-								element={<ForgotPasswordPage />}
-								needsAuth={false}
-							/>
-						}
+						element={getProtectedRouteElement(<ForgotPasswordPage />, false)}
 					/>
 					<Route
 						path={AppRoutes.ResetPassword}
-						element={
-							<ProtectedRouteElement
-								element={<ResetPasswordPage />}
-								needsAuth={false}
-							/>
-						}
+						element={getProtectedRouteElement(<ResetPasswordPage />, false)}
 					/>
-					<Route path={AppRoutes.OrderFeed} element={<OrderFeedPage />} />
+					<Route
+						path={AppRoutes.OrderFeed}
+						element={getProtectedRouteElement(<OrderFeedPage />, true)}
+					/>
 					<Route
 						path={AppRoutes.Profile}
-						element={
-							<ProtectedRouteElement element={<ProfilePage />} needsAuth={true} />
-						}
+						element={getProtectedRouteElement(<ProfilePage />, true)}
 					>
 						<Route index element={<UserPage />} />
 						<Route path={ProfileRoutes.Orders} element={<OrderHistoryPage />} />
