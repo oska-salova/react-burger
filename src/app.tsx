@@ -15,6 +15,7 @@ import UserPage from './pages/user/user';
 import OrderHistoryPage from './pages/order/order-history';
 import OrderDetailsPage from './pages/order/order-details';
 import { IngredientPage } from './pages/ingredient/ingredient';
+import ProtectedRouteElement from './components/protected-route';
 
 function App() {
 	const location = useLocation();
@@ -28,12 +29,43 @@ function App() {
 						path={AppRoutes.Ingredient}
 						element={location.state?.ingredientId ? <HomePage /> : <IngredientPage />}
 					/>
-					<Route path={AppRoutes.Login} element={<LoginPage />} />
-					<Route path={AppRoutes.Register} element={<RegisterPage />} />
-					<Route path={AppRoutes.ForgotPassword} element={<ForgotPasswordPage />} />
-					<Route path={AppRoutes.ResetPassword} element={<ResetPasswordPage />} />
+					<Route
+						path={AppRoutes.Login}
+						element={
+							<ProtectedRouteElement element={<LoginPage />} needsAuth={false} />
+						}
+					/>
+					<Route
+						path={AppRoutes.Register}
+						element={
+							<ProtectedRouteElement element={<RegisterPage />} needsAuth={false} />
+						}
+					/>
+					<Route
+						path={AppRoutes.ForgotPassword}
+						element={
+							<ProtectedRouteElement
+								element={<ForgotPasswordPage />}
+								needsAuth={false}
+							/>
+						}
+					/>
+					<Route
+						path={AppRoutes.ResetPassword}
+						element={
+							<ProtectedRouteElement
+								element={<ResetPasswordPage />}
+								needsAuth={false}
+							/>
+						}
+					/>
 					<Route path={AppRoutes.OrderFeed} element={<OrderFeedPage />} />
-					<Route path={AppRoutes.Profile} element={<ProfilePage />}>
+					<Route
+						path={AppRoutes.Profile}
+						element={
+							<ProtectedRouteElement element={<ProfilePage />} needsAuth={true} />
+						}
+					>
 						<Route index element={<UserPage />} />
 						<Route path={ProfileRoutes.Orders} element={<OrderHistoryPage />} />
 						<Route

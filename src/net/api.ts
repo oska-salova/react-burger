@@ -1,4 +1,4 @@
-import { localStorageUtils } from '../model/local-stoage';
+import { localStorageUtils } from '../model/local-storage';
 import { RefreshTokenResponse } from '../model/net/auth.interface';
 import { post } from './net';
 

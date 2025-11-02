@@ -7,7 +7,7 @@ import {
 	LogOutResponse,
 } from '../model/net/auth.interface';
 import { userSlice } from './user';
-import { localStorageUtils } from '../model/local-stoage';
+import { localStorageUtils } from '../model/local-storage';
 
 type AuthState = {
 	isAuthenticated: boolean;

@@ -8,7 +8,7 @@ import {
 	UpdateUserResponse,
 } from '../model/net/user.interface';
 import { User } from '../model/user';
-import { localStorageUtils } from '../model/local-stoage';
+import { localStorageUtils } from '../model/local-storage';
 
 type UserState = {
 	user: User | null;
@@ -51,6 +51,8 @@ export const updateUser = createAsyncThunk<UpdateUserResponse, UpdateUserRequest
 	'user/update',
 	async (updateUserInfo, thunkAPI) => {
 		return patch<GetUserResponse>('auth/user', updateUserInfo).catch(error => {
+			localStorageUtils.removeAccessToken();
+			localStorageUtils.removeRefreshToken();
 			return thunkAPI.rejectWithValue({
 				message: error.message,
 			});
