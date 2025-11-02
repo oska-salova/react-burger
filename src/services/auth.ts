@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { post } from '../net/net';
 import {
 	LogInRequest,
@@ -58,7 +58,11 @@ export const logOut = createAsyncThunk<LogOutResponse>('auth/logout', async (_, 
 export const authSlice = createSlice({
 	name: 'auth',
 	initialState,
-	reducers: {},
+	reducers: {
+		setAuth(state, action: PayloadAction<boolean>) {
+			state.isAuthenticated = action.payload;
+		},
+	},
 	extraReducers: builder => {
 		builder
 			.addCase(logIn.fulfilled, state => {
@@ -79,6 +83,8 @@ export const authSlice = createSlice({
 			})
 			.addCase(logOut.fulfilled, state => {
 				state.isAuthenticated = false;
+				state.pending = false;
+				state.error = null;
 			})
 			.addCase(logOut.rejected, (state, action) => {
 				state.isAuthenticated = false;

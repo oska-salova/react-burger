@@ -3,15 +3,14 @@ import {
 	EmailInput,
 	PasswordInput,
 } from '@ya.praktikum/react-developer-burger-ui-components';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { ChangeEvent, FormEvent, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { AppRoutes } from '../config';
 import { logIn } from '../../services/auth';
 import { useAppDispatch, useAppSelector } from '../../services/store';
 
 function LoginPage() {
 	const dispatch = useAppDispatch();
-	const navigate = useNavigate();
 	const authState = useAppSelector(state => state.authReducer);
 
 	const [form, setFormValue] = useState({ email: '', password: '' });
@@ -25,12 +24,6 @@ function LoginPage() {
 	};
 
 	const isSubmitAvailable = Object.values(form).every(value => !!value) && !authState.pending;
-
-	useEffect(() => {
-		if (authState.isAuthenticated) {
-			navigate(AppRoutes.Home);
-		}
-	}, [authState]);
 
 	return (
 		<form className="flex-center login-container" onSubmit={handleSubmit}>

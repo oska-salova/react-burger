@@ -12,45 +12,43 @@ interface ProtectedRouteElementProps {
 
 function ProtectedRouteElement({ element, needsAuth }: ProtectedRouteElementProps) {
 	const dispatch = useAppDispatch();
-	const user = useAppSelector(state => state.userReducer.user);
-	const isUserLoading = useAppSelector(state => state.userReducer.pending);
-	const userError = useAppSelector(state => state.userReducer.error);
+	const isAuthenticated = useAppSelector(state => state.authReducer.isAuthenticated);
 	const navigate = useNavigate();
 	const [canProceedNavigation, setCanProceedNavigation] = useState(false);
 	const accessToken = localStorageUtils.getAccessToken();
+	const [isGetUserRequired, setIsGetUserRequired] = useState(false);
 
 	useEffect(() => {
 		if (needsAuth) {
-			if (accessToken) {
-				if (user) {
-					setCanProceedNavigation(true);
-				} else {
-					!isUserLoading && !userError && dispatch(getUser());
-				}
+			if (isAuthenticated) {
+				setCanProceedNavigation(true);
 			} else {
-				navigate(AppRoutes.Login, { replace: true });
-				return;
+				if (accessToken) {
+					setIsGetUserRequired(true);
+				} else {
+					navigate(AppRoutes.Login, { replace: true });
+					return;
+				}
 			}
 		} else {
-			if (accessToken) {
-				if (user) {
-					navigate(AppRoutes.Home, { replace: true });
-					return;
-				} else {
-					!isUserLoading && !userError && dispatch(getUser());
-				}
+			if (isAuthenticated) {
+				navigate(AppRoutes.Home, { replace: true });
 			} else {
 				setCanProceedNavigation(true);
 			}
 		}
-	}, [needsAuth, user, accessToken, isUserLoading]);
+	}, [needsAuth, isAuthenticated, accessToken]);
+
+	useEffect(() => {
+		const controller = new AbortController();
+		dispatch(getUser(undefined, { signal: controller.signal }));
+		return () => {
+			controller.abort();
+		};
+	}, [isGetUserRequired]);
 
 	if (canProceedNavigation) {
 		return element;
-	}
-
-	if (userError) {
-		return <p className="text text_type_main-default text_color_error">{userError}</p>;
 	}
 
 	return <p className="text text_type_main-default">Loading...</p>;
