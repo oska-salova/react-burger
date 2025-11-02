@@ -3,8 +3,10 @@ import styles from './app-header.module.css';
 import HeaderItem from './header-item/header-item';
 import { Link } from 'react-router-dom';
 import { AppRoutes } from '../../pages/config';
+import { useAppSelector } from '../../services/store';
 
 function AppHeader() {
+	const userName = useAppSelector(state => state.userReducer.user?.name);
 	return (
 		<header className={styles.header}>
 			<nav className={styles.content}>
@@ -15,7 +17,7 @@ function AppHeader() {
 				<Link to={AppRoutes.Home}>
 					<Logo />
 				</Link>
-				<HeaderItem type="account" caption="Личный кабинет" />
+				<HeaderItem type="account" caption={userName ?? 'Личный кабинет'} />
 			</nav>
 		</header>
 	);
