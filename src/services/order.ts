@@ -34,7 +34,11 @@ export const createOrder = createAsyncThunk<RegisterOrderResponse, string[]>(
 export const orderSlice = createSlice({
 	name: 'order',
 	initialState,
-	reducers: {},
+	reducers: {
+		reset() {
+			return initialState;
+		},
+	},
 	extraReducers: builder => {
 		builder
 			.addCase(createOrder.fulfilled, (state, { payload }) => {

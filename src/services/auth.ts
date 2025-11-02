@@ -9,6 +9,8 @@ import {
 import { userSlice } from './user';
 import { token } from '../model/token';
 import { password } from '../model/password';
+import { orderSlice } from './order';
+import { burgerConstructorSlice } from './burger/constructor';
 
 type AuthState = {
 	isAuthenticated: boolean;
@@ -50,6 +52,8 @@ export const logOut = createAsyncThunk<LogOutResponse>('auth/logout', async (_, 
 		.finally(() => {
 			token.removeTokens();
 			thunkAPI.dispatch(userSlice.actions.delete());
+			thunkAPI.dispatch(orderSlice.actions.reset());
+			thunkAPI.dispatch(burgerConstructorSlice.actions.clear());
 		})
 		.catch(error => {
 			return thunkAPI.rejectWithValue({

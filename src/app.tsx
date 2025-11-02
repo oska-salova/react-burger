@@ -9,23 +9,53 @@ import LoginPage from './pages/auth/login';
 import ForgotPasswordPage from './pages/auth/forgot-password';
 import ResetPasswordPage from './pages/auth/reset-password';
 import RegisterPage from './pages/auth/register';
-import { Provider } from 'react-redux';
-import { store } from './services/store';
+import { useAppDispatch, useAppSelector } from './services/store';
 import UserPage from './pages/user/user';
 import OrderHistoryPage from './pages/order/order-history';
 import OrderDetailsPage from './pages/order/order-details';
 import { IngredientPage } from './pages/ingredient/ingredient';
 import ProtectedRouteElement from './components/protected-route';
-import { ReactElement } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
+import { getUser } from './services/user';
+import { token } from './model/token';
 
 function App() {
 	const location = useLocation();
+	const dispatch = useAppDispatch();
+	const userState = useAppSelector(state => state.userReducer);
+	const accessToken = token.getAccessToken();
+	const [isUserChecked, setIsUserChecked] = useState(false);
 
 	const getProtectedRouteElement = (element: ReactElement, needsAuth: boolean): ReactElement => {
 		return <ProtectedRouteElement element={element} needsAuth={needsAuth} />;
 	};
+
+	useEffect(() => {
+		let controller: AbortController | null;
+		if (accessToken) {
+			controller = new AbortController();
+			dispatch(getUser(undefined, { signal: controller.signal }));
+		} else {
+			setIsUserChecked(true);
+		}
+
+		return () => {
+			controller?.abort();
+		};
+	}, []);
+
+	useEffect(() => {
+		if (userState.error || userState.user) {
+			setIsUserChecked(true);
+		}
+	}, [userState.error, userState.user]);
+
+	if (!isUserChecked) {
+		return <p className="text text_type_main-default">User data preparing...</p>;
+	}
+
 	return (
-		<Provider store={store}>
+		<>
 			<AppHeader />
 			<main className="main">
 				<Routes>
@@ -69,7 +99,7 @@ function App() {
 					<Route path={AppRoutes.NotFound} element={<NotFoundPage />} />
 				</Routes>
 			</main>
-		</Provider>
+		</>
 	);
 }
 
