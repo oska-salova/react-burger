@@ -10,6 +10,8 @@ import { useDrop } from 'react-dnd';
 import { DragIngredient, IngredientDropType } from '../../model/burger';
 import { burgerConstructorSlice } from '../../services/burger/constructor';
 import { createOrder } from '../../services/order';
+import { useNavigate } from 'react-router-dom';
+import { AppRoutes } from '../../pages/config';
 
 function BurgerConstructor() {
 	const dispatch = useAppDispatch();
@@ -17,6 +19,8 @@ function BurgerConstructor() {
 	const bun = useAppSelector(state => state.burgerConstructorReducer.bun);
 	const customIngredients = useAppSelector(state => state.burgerConstructorReducer.ingredients);
 	const orderState = useAppSelector(state => state.orderReducer);
+	const isAuthenticated = useAppSelector(state => state.authReducer.isAuthenticated);
+	const navigate = useNavigate();
 
 	const customIngredientsRef = useRef<HTMLUListElement | null>(null);
 	const [isModalOpen, modal, openModal] = useModal('', <OrderDetails />);
@@ -58,6 +62,10 @@ function BurgerConstructor() {
 
 	const handleOrderButtonClick = () => {
 		if (bun) {
+			if (!isAuthenticated) {
+				navigate(AppRoutes.Login);
+				return;
+			}
 			dispatch(
 				createOrder([
 					bun._id,
