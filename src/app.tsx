@@ -20,6 +20,9 @@ import { getUser } from './services/user';
 import { token } from './model/token';
 import { burgerConstructorSlice } from './services/burger/constructor';
 import { orderSlice } from './services/order';
+import Modal from './components/modal/modal';
+import IngredientDetails from './components/burger-ingredients/ingredient-details/ingredient-details';
+import { getIngredients } from './services/burger/ingredients';
 
 function App() {
 	const location = useLocation();
@@ -48,6 +51,14 @@ function App() {
 	}, []);
 
 	useEffect(() => {
+		const controller = new AbortController();
+		dispatch(getIngredients(undefined, { signal: controller.signal }));
+		return () => {
+			controller.abort();
+		};
+	}, [dispatch]);
+
+	useEffect(() => {
 		if (userState.error || userState.user) {
 			setIsUserChecked(true);
 		}
@@ -68,19 +79,18 @@ function App() {
 	}, [location.pathname]);
 
 	if (!isUserChecked) {
-		return <p className="text text_type_main-default">User data preparing...</p>;
+		return <p className="text text_type_main-default">App data preparing...</p>;
 	}
+
+	const backgroundLocation = location.state?.backgroundLocation;
 
 	return (
 		<>
 			<AppHeader />
 			<main className="main">
-				<Routes>
+				<Routes location={backgroundLocation || location}>
 					<Route path={AppRoutes.Home} element={<HomePage />} />
-					<Route
-						path={AppRoutes.Ingredient}
-						element={location.state?.ingredientId ? <HomePage /> : <IngredientPage />}
-					/>
+					<Route path={AppRoutes.Ingredient} element={<IngredientPage />} />
 					<Route
 						path={AppRoutes.Login}
 						element={getProtectedRouteElement(<LoginPage />, false)}
@@ -115,6 +125,18 @@ function App() {
 					</Route>
 					<Route path={AppRoutes.NotFound} element={<NotFoundPage />} />
 				</Routes>
+				{backgroundLocation && (
+					<Routes>
+						<Route
+							path={AppRoutes.Ingredient}
+							element={
+								<Modal header="Детали ингредиента">
+									<IngredientDetails />
+								</Modal>
+							}
+						/>
+					</Routes>
+				)}
 			</main>
 		</>
 	);

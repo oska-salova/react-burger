@@ -1,13 +1,9 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import styles from './burger-ingredients.module.css';
 import { Tab } from '@ya.praktikum/react-developer-burger-ui-components';
 import { BurgerIngredient, IngredientType } from '../../model/burger';
 import BurgerIngredientItem from './burger-ingredient-item/burger-ingredient-item';
-import IngredientDetails from './ingredient-details/ingredient-details';
-import { useModal } from '../../hooks/useModal';
-import { useAppDispatch, useAppSelector } from '../../services/store';
-import { getIngredients } from '../../services/burger/ingredients';
-import { currentIngredientDetailsSlice } from '../../services/burger/ingredient-details';
+import { useAppSelector } from '../../services/store';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AppRoutes } from '../../pages/config';
 
@@ -19,24 +15,12 @@ const GROUP_NAMES: Record<IngredientType, string> = {
 
 function BurgerIngredients() {
 	const location = useLocation();
-	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const isLoading = useAppSelector(state => state.ingredientsReducer.loading);
 	const ingredients = useAppSelector(state => state.ingredientsReducer.ingredients);
 	const error = useAppSelector(state => state.ingredientsReducer.error);
 	const selectedIngredients = useAppSelector(state => state.burgerConstructorReducer.ingredients);
 	const selectedBun = useAppSelector(state => state.burgerConstructorReducer.bun);
-	const detailsIngredient = useAppSelector(
-		state => state.currentIngredientDetailsReducer.ingredient,
-	);
-
-	useEffect(() => {
-		const controller = new AbortController();
-		dispatch(getIngredients(undefined, { signal: controller.signal }));
-		return () => {
-			controller.abort();
-		};
-	}, [dispatch]);
 
 	const [currentTab, setCurrentTab] = useState(IngredientType.bun.toString());
 	const ingredientsRef = useRef<HTMLDivElement | null>(null);
@@ -129,43 +113,11 @@ function BurgerIngredients() {
 		setCurrentTab(tab);
 	};
 
-	const [isModalOpen, modal, openModal, closeModal] = useModal('Детали ингредиента');
 	const handleIngredientClick = (ingredient: BurgerIngredient) => {
-		dispatch(currentIngredientDetailsSlice.actions.set(ingredient));
 		navigate(AppRoutes.Ingredient.replace(':id', ingredient._id), {
-			state: { ingredientId: ingredient._id },
+			state: { backgroundLocation: location },
 		});
 	};
-
-	useEffect(() => {
-		const historyIngredientId = location.state?.ingredientId;
-		if (historyIngredientId) {
-			const foundIngredient = ingredients.find(
-				ingredient => ingredient._id === historyIngredientId,
-			);
-			if (foundIngredient) {
-				dispatch(currentIngredientDetailsSlice.actions.set(foundIngredient));
-				openModal(<IngredientDetails />);
-			}
-		}
-	}, [location.state, ingredients]);
-
-	useEffect(() => {
-		const historyIngredientId = location.state?.ingredientId;
-		if (!historyIngredientId) {
-			closeModal();
-		}
-	}, [location.pathname]);
-
-	useEffect(() => {
-		if (!isModalOpen) {
-			const isIngredientViewCompleted = !!detailsIngredient;
-			if (isIngredientViewCompleted) {
-				dispatch(currentIngredientDetailsSlice.actions.delete());
-				navigate(AppRoutes.Home);
-			}
-		}
-	}, [isModalOpen]);
 
 	if (isLoading) {
 		return <p className="text text_type_main-default m-2">BurgerIngredients: loading...</p>;
@@ -222,7 +174,6 @@ function BurgerIngredients() {
 					))}
 				</div>
 			</section>
-			{isModalOpen && modal}
 		</>
 	);
 }

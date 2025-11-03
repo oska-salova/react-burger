@@ -2,7 +2,6 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import ingredientsReducer from './burger/ingredients';
 import burgerConstructorReducer from './burger/constructor';
-import currentIngredientDetailsReducer from './burger/ingredient-details';
 import orderReducer from './order';
 import userReducer from './user';
 import authReducer from './auth';
@@ -11,7 +10,6 @@ export const store = configureStore({
 	reducer: {
 		ingredientsReducer,
 		burgerConstructorReducer,
-		currentIngredientDetailsReducer,
 		orderReducer,
 		userReducer,
 		authReducer,

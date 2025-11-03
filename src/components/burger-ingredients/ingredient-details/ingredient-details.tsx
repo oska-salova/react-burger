@@ -1,8 +1,20 @@
 import styles from './ingredient-details.module.css';
 import { useAppSelector } from '../../../services/store';
+import { useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { BurgerIngredient } from '../../../model/burger';
 
 const IngredientDetails = () => {
-	const ingredient = useAppSelector(state => state.currentIngredientDetailsReducer.ingredient);
+	const { id } = useParams();
+	const [ingredient, setIngredient] = useState<BurgerIngredient | null>(null);
+	const ingredients = useAppSelector(state => state.ingredientsReducer.ingredients);
+
+	useEffect(() => {
+		const foundIngredient = ingredients.find(ingredient => ingredient._id === id);
+		if (foundIngredient) {
+			setIngredient(foundIngredient);
+		}
+	}, [ingredients]);
 
 	const getNutrient = (title: string, value: number) => (
 		<div className={styles.nutrient}>
@@ -12,7 +24,7 @@ const IngredientDetails = () => {
 	);
 
 	if (!ingredient) {
-		return null;
+		return <p className="text text_type_main-small">Получаем данные ...</p>;
 	}
 	return (
 		<section className={styles.details}>
