@@ -1,22 +1,20 @@
 import { Button, EmailInput } from '@ya.praktikum/react-developer-burger-ui-components';
-import { ChangeEvent, FormEvent, useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AppRoutes } from '../config';
-import { resetPassword } from '../../net/api';
+import { resetPassword, ResetPasswordRequest } from '../../net/api';
 import { password } from '../../model/password';
+import { useForm } from '../../hooks/useForm';
 
 function ForgotPasswordPage() {
 	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState(false);
+	const { formValues, handleChange } = useForm<ResetPasswordRequest>({ email: '' });
 
-	const [form, setFormValue] = useState({ email: '' });
-	const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setFormValue({ ...form, [e.target.name]: e.target.value });
-	};
 	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		setIsLoading(true);
-		resetPassword(form, 'reset')
+		resetPassword(formValues, 'reset')
 			.then((success: boolean) => {
 				if (success) {
 					password.enableReset();
@@ -28,15 +26,15 @@ function ForgotPasswordPage() {
 			});
 	};
 
-	const isSubmitAvailable = Object.values(form).every(value => !!value) && !isLoading;
+	const isSubmitAvailable = Object.values(formValues).every(value => !!value) && !isLoading;
 
 	return (
 		<form className="flex-center login-container" onSubmit={handleSubmit}>
 			<p className="text text_type_main-default mb-6">Восстановление пароля</p>
 			<EmailInput
 				placeholder="Укажите e-mail"
-				onChange={onChange}
-				value={form.email}
+				onChange={handleChange}
+				value={formValues.email}
 				name="email"
 				isIcon={false}
 				extraClass="mb-6"

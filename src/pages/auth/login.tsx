@@ -3,41 +3,40 @@ import {
 	EmailInput,
 	PasswordInput,
 } from '@ya.praktikum/react-developer-burger-ui-components';
-import { ChangeEvent, FormEvent, useState } from 'react';
+import { FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { AppRoutes } from '../config';
 import { logIn } from '../../services/auth';
 import { useAppDispatch, useAppSelector } from '../../services/store';
+import { useForm } from '../../hooks/useForm';
+import { LogInRequest } from '../../model/net/auth.interface';
 
 function LoginPage() {
 	const dispatch = useAppDispatch();
 	const authState = useAppSelector(state => state.authReducer);
-
-	const [form, setFormValue] = useState({ email: '', password: '' });
-	const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setFormValue({ ...form, [e.target.name]: e.target.value });
-	};
+	const { formValues, handleChange } = useForm<LogInRequest>({ email: '', password: '' });
 
 	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		dispatch(logIn(form));
+		dispatch(logIn(formValues));
 	};
 
-	const isSubmitAvailable = Object.values(form).every(value => !!value) && !authState.pending;
+	const isSubmitAvailable =
+		Object.values(formValues).every(value => !!value) && !authState.pending;
 
 	return (
 		<form className="flex-center login-container" onSubmit={handleSubmit}>
 			<p className="text text_type_main-default mb-6">Вход</p>
 			<EmailInput
-				onChange={onChange}
-				value={form.email}
+				onChange={handleChange}
+				value={formValues.email}
 				name="email"
 				isIcon={false}
 				extraClass="mb-6"
 			/>
 			<PasswordInput
-				onChange={onChange}
-				value={form.password}
+				onChange={handleChange}
+				value={formValues.password}
 				name="password"
 				extraClass="mb-6"
 			/>

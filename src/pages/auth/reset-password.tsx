@@ -1,9 +1,10 @@
 import { Button, Input, PasswordInput } from '@ya.praktikum/react-developer-burger-ui-components';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AppRoutes } from '../config';
-import { resetPassword } from '../../net/api';
+import { resetPassword, RestorePasswordRequest } from '../../net/api';
 import { password } from '../../model/password';
+import { useForm } from '../../hooks/useForm';
 
 function ResetPasswordPage() {
 	const navigate = useNavigate();
@@ -15,15 +16,15 @@ function ResetPasswordPage() {
 		}
 	}, []);
 
-	const [form, setFormValue] = useState({ password: '', token: '' });
-	const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setFormValue({ ...form, [e.target.name]: e.target.value });
-	};
+	const { formValues, handleChange } = useForm<RestorePasswordRequest>({
+		password: '',
+		token: '',
+	});
 
 	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		setIsLoading(true);
-		resetPassword(form, 'restore')
+		resetPassword(formValues, 'restore')
 			.then((success: boolean) => {
 				if (success) {
 					password.disableReset();
@@ -35,23 +36,23 @@ function ResetPasswordPage() {
 			});
 	};
 
-	const isSubmitAvailable = Object.values(form).every(value => !!value) && !isLoading;
+	const isSubmitAvailable = Object.values(formValues).every(value => !!value) && !isLoading;
 
 	return (
 		<form className="flex-center login-container" onSubmit={handleSubmit}>
 			<p className="text text_type_main-default mb-6">Восстановление пароля</p>
 			<PasswordInput
 				placeholder="Введите новый пароль"
-				onChange={onChange}
-				value={form.password}
+				onChange={handleChange}
+				value={formValues.password}
 				name="password"
 				extraClass="mb-6"
 			/>
 			<Input
 				type="text"
 				placeholder="Введите код из письма"
-				onChange={onChange}
-				value={form.token}
+				onChange={handleChange}
+				value={formValues.token}
 				name="token"
 				extraClass="mb-6"
 				onPointerEnterCapture={undefined}

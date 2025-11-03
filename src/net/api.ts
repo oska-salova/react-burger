@@ -2,7 +2,9 @@ import { token } from '../model/token';
 import { RefreshTokenResponse } from '../model/net/auth.interface';
 import { post } from './net';
 
-type ResetPasswordRequestBody = { email: string } | { password: string; token: string };
+export type ResetPasswordRequest = { email: string };
+export type RestorePasswordRequest = { password: string; token: string };
+type ResetPasswordRequestBody = ResetPasswordRequest | RestorePasswordRequest;
 
 export async function resetPassword(
 	data: ResetPasswordRequestBody,

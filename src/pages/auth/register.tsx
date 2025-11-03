@@ -4,27 +4,30 @@ import {
 	Input,
 	PasswordInput,
 } from '@ya.praktikum/react-developer-burger-ui-components';
-import { ChangeEvent, FormEvent, useState } from 'react';
+import { FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { AppRoutes } from '../config';
 import { useAppDispatch, useAppSelector } from '../../services/store';
 import { registerUser } from '../../services/user';
+import { useForm } from '../../hooks/useForm';
+import { RegisterUserRequest } from '../../model/net/user.interface';
 
 function RegisterPage() {
 	const dispatch = useAppDispatch();
 	const userState = useAppSelector(state => state.userReducer);
-
-	const [form, setFormValue] = useState({ name: '', email: '', password: '' });
-	const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setFormValue({ ...form, [e.target.name]: e.target.value });
-	};
+	const { formValues, handleChange } = useForm<RegisterUserRequest>({
+		name: '',
+		email: '',
+		password: '',
+	});
 
 	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		dispatch(registerUser(form));
+		dispatch(registerUser(formValues));
 	};
 
-	const isSubmitAvailable = Object.values(form).every(value => !!value) && !userState.pending;
+	const isSubmitAvailable =
+		Object.values(formValues).every(value => !!value) && !userState.pending;
 
 	return (
 		<form className="flex-center login-container" onSubmit={handleSubmit}>
@@ -32,23 +35,23 @@ function RegisterPage() {
 			<Input
 				type="text"
 				placeholder="Имя"
-				onChange={onChange}
-				value={form.name}
+				onChange={handleChange}
+				value={formValues.name}
 				name="name"
 				extraClass="mb-6"
 				onPointerEnterCapture={undefined}
 				onPointerLeaveCapture={undefined}
 			/>
 			<EmailInput
-				onChange={onChange}
-				value={form.email}
+				onChange={handleChange}
+				value={formValues.email}
 				name="email"
 				isIcon={false}
 				extraClass="mb-6"
 			/>
 			<PasswordInput
-				onChange={onChange}
-				value={form.password}
+				onChange={handleChange}
+				value={formValues.password}
 				name="password"
 				extraClass="mb-6"
 			/>

@@ -5,46 +5,47 @@ import {
 	PasswordInput,
 } from '@ya.praktikum/react-developer-burger-ui-components';
 import { useAppDispatch, useAppSelector } from '../../services/store';
-import { ChangeEvent, FormEvent, useState } from 'react';
+import { FormEvent } from 'react';
 import styles from './user.module.css';
 import { updateUser } from '../../services/user';
 import { UpdateUserRequest } from '../../model/net/user.interface';
+import { useForm } from '../../hooks/useForm';
+
+type UpdateUserForm = Required<UpdateUserRequest>;
 
 function UserPage() {
 	const dispatch = useAppDispatch();
 	const userState = useAppSelector(state => state.userReducer);
 	const user = userState.user;
-	const forDefaultValue = {
+	const formDefaultValue = {
 		name: user?.name ?? '',
 		email: user?.email ?? '',
 		password: '',
-	};
-
-	const [form, setFormValue] = useState(forDefaultValue);
-	const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setFormValue({ ...form, [e.target.name]: e.target.value });
-	};
+	} as UpdateUserForm;
+	const { formValues, handleChange, setFormValues } = useForm<UpdateUserForm>(formDefaultValue);
 
 	const isUserDataModified =
-		form.name !== (user?.name ?? '') || form.email !== (user?.email ?? '') || !!form.password;
+		formValues.name !== (user?.name ?? '') ||
+		formValues.email !== (user?.email ?? '') ||
+		!!formValues.password;
 
 	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		const updateData = { ...form } as UpdateUserRequest;
-		if (user?.name === form.name) {
+		const updateData = { ...formValues } as UpdateUserRequest;
+		if (user?.name === formValues.name) {
 			delete updateData.name;
 		}
-		if (user?.email === form.email) {
+		if (user?.email === formValues.email) {
 			delete updateData.email;
 		}
-		if (!form.password) {
+		if (!formValues.password) {
 			delete updateData.password;
 		}
 		dispatch(updateUser(updateData));
 	};
 
 	const handleCancel = () => {
-		setFormValue(forDefaultValue);
+		setFormValues(formDefaultValue);
 	};
 
 	const isSubmitAvailable = isUserDataModified && !userState.pending;
@@ -55,8 +56,8 @@ function UserPage() {
 				<Input
 					type="text"
 					placeholder="Имя"
-					onChange={onChange}
-					value={form.name}
+					onChange={handleChange}
+					value={formValues.name}
 					name="name"
 					extraClass="mb-6"
 					icon="EditIcon"
@@ -64,15 +65,15 @@ function UserPage() {
 					onPointerLeaveCapture={undefined}
 				/>
 				<EmailInput
-					onChange={onChange}
-					value={form.email}
+					onChange={handleChange}
+					value={formValues.email}
 					name="email"
 					isIcon={true}
 					extraClass="mb-6"
 				/>
 				<PasswordInput
-					onChange={onChange}
-					value={form.password}
+					onChange={handleChange}
+					value={formValues.password}
 					name="password"
 					icon="EditIcon"
 					extraClass="mb-6"
