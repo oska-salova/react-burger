@@ -32,16 +32,6 @@ body {
 	overflow: auto;
 }
 
-.main-content {
-	position: relative;
-	left: 50%;
-	transform: translate(-50%, 0);
-	max-width: var(--content-max-width);
-	display: flex;
-	justify-content: space-between;
-	gap: 48px;
-}
-
 .dragHover {
 	border: 1px solid var(--colors-interface-accent);
 }
@@ -88,4 +78,48 @@ body {
 	*::-webkit-scrollbar-button {
 		display: none;
 	}
+}
+
+.flex-center {
+	display: flex;
+	width: 100%;
+	height: 100%;
+	justify-content: center;
+	align-items: center;
+}
+
+.flex-columns {
+	flex-direction: column;
+}
+
+a {
+	text-decoration: none;
+	color: var(--text-inactive-color);
+}
+
+a svg {
+	fill: var(--text-inactive-color);
+}
+
+a.active {
+	color: var(--text-primary-color);
+}
+
+a.active svg {
+	fill: var(--text-primary-color);
+}
+
+.login-container {
+	flex-direction: column;
+	gap: 0;
+	min-width: 480px;
+	min-height: 430px;
+}
+
+.login-action {
+	display: flex;
+	flex-direction: row;
+	gap: 8px;
+	flex-wrap: nowrap;
+	align-items: center;
 }
