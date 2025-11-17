@@ -55,7 +55,7 @@ async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
 			return request<T>(endpoint, addAuthHeader(endpoint, options ?? {}));
 		}
 		return checkResponse(response)
-			.then(checkSuccess<T>)
+			.then(response => checkSuccess<T>(response))
 			.catch(parseError);
 	} catch (error: unknown) {
 		parseError(error);
