@@ -22,7 +22,7 @@ function BurgerIngredients() {
 	const selectedIngredients = useAppSelector(state => state.burgerConstructorReducer.ingredients);
 	const selectedBun = useAppSelector(state => state.burgerConstructorReducer.bun);
 
-	const [currentTab, setCurrentTab] = useState(IngredientType.bun.toString());
+	const [currentTab, setCurrentTab] = useState<IngredientType>(IngredientType.bun);
 	const ingredientsRef = useRef<HTMLDivElement | null>(null);
 	const tabContentRefs = useRef<Record<IngredientType, HTMLElement | null>>({
 		[IngredientType.bun]: null,
@@ -78,7 +78,7 @@ function BurgerIngredients() {
 	}, [ingredients]);
 
 	const handleTabClick = (tab: string) => {
-		setCurrentTab(tab);
+		setCurrentTab(tab as IngredientType);
 
 		if (tabContentRefs?.current) {
 			const tabContentElement = tabContentRefs.current[tab as IngredientType];
@@ -109,8 +109,8 @@ function BurgerIngredients() {
 			}
 		});
 
-		const tab = Object.keys(tabContentRefs.current)[minIndex];
-		setCurrentTab(tab);
+		const tabs = Object.keys(tabContentRefs.current) as IngredientType[];
+		setCurrentTab(tabs[minIndex]);
 	};
 
 	const handleIngredientClick = (ingredient: BurgerIngredient) => {

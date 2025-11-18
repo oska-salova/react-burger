@@ -5,7 +5,7 @@ export function useModal(
 	header?: string,
 	children?: ReactNode,
 ): [typeof isModalOpen, typeof modal, typeof openModal, typeof closeModal] {
-	const [modalContent, setModalContent] = useState(children ?? null);
+	const [modalContent, setModalContent] = useState<ReactNode>(children ?? null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
 	const openModal = (children?: ReactNode) => {
