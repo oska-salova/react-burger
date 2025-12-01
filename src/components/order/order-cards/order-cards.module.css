@@ -1,0 +1,19 @@
+.cards {
+	display: flex;
+	flex-direction: column;
+	padding: 0;
+	margin: 0;
+	width: 100%;
+}
+
+.cardsSmall {
+	gap: 16px;
+}
+
+.cardsLarge {
+	gap: 24px;
+}
+
+.card {
+	display: block;
+}
