@@ -1,9 +1,14 @@
 .cards {
+	--top: 0px;
 	display: flex;
 	flex-direction: column;
 	padding: 0;
+	padding-right: 8px;
 	margin: 0;
 	width: 100%;
+	min-height: 420px;
+	max-height: calc(100vh - var(--top));
+	overflow: auto;
 }
 
 .cardsSmall {
