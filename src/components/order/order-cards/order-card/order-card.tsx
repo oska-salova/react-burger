@@ -5,6 +5,7 @@ import { CurrencyIcon, FormattedDate } from '@ya.praktikum/react-developer-burge
 import IngredientCircle from '../ingredient-circle/ingredient-circle';
 
 const orderStatusDict: Record<OrderStatus, string> = {
+	[OrderStatus.in_progress]: 'В работе',
 	[OrderStatus.done]: 'Выполнен',
 };
 

@@ -1,0 +1,30 @@
+.page {
+	position: relative;
+	left: 50%;
+	transform: translate(-50%, 0);
+	max-width: var(--content-max-width);
+	display: block;
+	padding: 0;
+}
+
+.feed {
+	display: flex;
+	justify-content: start;
+	gap: 60px;
+}
+
+.cards {
+	max-width: 600px;
+}
+
+.board {
+	display: block;
+	width: 100%;
+	min-width: 400px;
+}
+
+@media (max-width: 1280px) {
+	.page {
+		padding-inline: 20px;
+	}
+}

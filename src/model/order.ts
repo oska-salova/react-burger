@@ -2,6 +2,7 @@ import { BurgerIngredient } from './burger';
 import { User } from './user';
 
 export enum OrderStatus {
+	in_progress = 'in_progress',
 	done = 'done',
 }
 

@@ -7,7 +7,7 @@
 	margin: 0;
 	width: 100%;
 	min-height: 420px;
-	max-height: calc(100vh - var(--top));
+	max-height: calc(100vh - var(--top) - var(--bottom-page-space));
 	overflow: auto;
 }
 
