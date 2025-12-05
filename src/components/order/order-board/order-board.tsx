@@ -3,15 +3,15 @@ import styles from './order-board.module.css';
 
 interface OrderBoardProps {
 	orders: Order[];
+	totalOrders: number;
+	totalTodayOrders: number;
 }
 
-function OrderBoard({ orders }: OrderBoardProps) {
+function OrderBoard({ orders, totalOrders, totalTodayOrders }: OrderBoardProps) {
 	const readyOrders = orders.filter(order => order.status === OrderStatus.done).slice(0, 10);
 	const progressOrders = orders
 		.filter(order => order.status === OrderStatus.in_progress)
 		.slice(0, 10);
-	const totalOrders = 150;
-	const totalTodayOrders = 15;
 
 	const getOrdersQueueBlock = (ready = false) => {
 		const queueOrders = ready ? readyOrders : progressOrders;

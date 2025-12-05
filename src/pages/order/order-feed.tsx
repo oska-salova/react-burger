@@ -8,7 +8,9 @@ import { useAppSelector } from '../../services/store';
 
 function OrderFeedPage() {
 	const dispatch = useDispatch();
-	const { orders, status, error } = useAppSelector(state => state.orderFeedReducer);
+	const { orders, status, error, totalOrders, totalTodayOrders } = useAppSelector(
+		state => state.orderFeedReducer,
+	);
 
 	useEffect(() => {
 		dispatch(orderFeedSlice.actions.connect('wss://norma.education-services.ru/orders/all'));
@@ -33,7 +35,11 @@ function OrderFeedPage() {
 					<OrderCards isHistory={false} orders={orders} />
 				</div>
 				<div className={styles.board}>
-					<OrderBoard orders={orders} />
+					<OrderBoard
+						orders={orders}
+						totalOrders={totalOrders}
+						totalTodayOrders={totalTodayOrders}
+					/>
 				</div>
 			</section>
 		</section>

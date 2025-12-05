@@ -7,12 +7,16 @@ type OrderFeedState = {
 	status: 'offline' | 'connecting' | 'online';
 	orders: Order[] | null;
 	error: string | null;
+	totalOrders: number;
+	totalTodayOrders: number;
 };
 
 const initialState: OrderFeedState = {
 	status: 'offline',
 	orders: null,
 	error: null,
+	totalOrders: 0,
+	totalTodayOrders: 0,
 };
 
 export const orderFeedSlice = createSlice({
@@ -23,8 +27,8 @@ export const orderFeedSlice = createSlice({
 		connect(state, _action: PayloadAction<string>) {
 			state.status = 'connecting';
 		},
-		disconnect(state) {
-			state.status = 'connecting';
+		disconnect() {
+			return initialState;
 		},
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		sendMessage(state, _action: PayloadAction<void>) {
@@ -45,6 +49,8 @@ export const orderFeedSlice = createSlice({
 		},
 		onMessageReceived(state, { payload }: PayloadAction<OrderFeedSocketMessage>) {
 			state.orders = payload.orders;
+			state.totalOrders = payload.total;
+			state.totalTodayOrders = payload.totalToday;
 		},
 	},
 });

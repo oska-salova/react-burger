@@ -4,6 +4,7 @@ import { Order, OrderStatus } from '../../../../model/order';
 import { CurrencyIcon, FormattedDate } from '@ya.praktikum/react-developer-burger-ui-components';
 import IngredientCircle from '../ingredient-circle/ingredient-circle';
 import { useAppSelector } from '../../../../services/store';
+import { BurgerIngredient } from '../../../../model/burger';
 
 const orderStatusDict: Record<OrderStatus, string> = {
 	[OrderStatus.in_progress]: 'В работе',
@@ -19,10 +20,11 @@ interface OrderCardProps {
 const OrderCard: FC<OrderCardProps> = memo(({ order, showStatus, onClick }) => {
 	const ingredients = useAppSelector(state => state.ingredientsReducer.ingredients);
 	const displayedIngredientIds = order.ingredients.slice(0, 6).reverse();
-	const displayedIngredients = ingredients.filter(ingredient =>
-		displayedIngredientIds.includes(ingredient._id),
+	const displayedIngredients = displayedIngredientIds.map(
+		ingredientId =>
+			ingredients.find(ingredient => ingredient._id === ingredientId) as BurgerIngredient,
 	);
-	const restIngredientsAmount = ingredients.length - displayedIngredients.length;
+	const restIngredientsAmount = order.ingredients.length - displayedIngredients.length;
 
 	const handleIngredientClick = () => {
 		onClick(order);
