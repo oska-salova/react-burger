@@ -2,14 +2,13 @@ import styles from './order-cards.module.css';
 import { Order } from '../../../model/order';
 import OrderCard from './order-card/order-card';
 import { useLayoutEffect, useRef } from 'react';
-import { DEBUG_ORDERS } from '../../../pages/order/order-board/debug';
 
 interface OrderCardsProps {
+	orders: Order[];
 	isHistory: boolean;
 }
 
-function OrderCards({ isHistory }: OrderCardsProps) {
-	const orders = DEBUG_ORDERS;
+function OrderCards({ orders, isHistory }: OrderCardsProps) {
 	const cardsRef = useRef<HTMLUListElement | null>(null);
 
 	const handleOrderClick = (order: Order) => {

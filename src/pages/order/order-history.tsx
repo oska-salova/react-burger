@@ -4,7 +4,7 @@ import styles from './order-history.module.css';
 function OrderHistoryPage() {
 	return (
 		<section className={`flex-center ${styles.history}`}>
-			<OrderCards isHistory={true} />
+			<OrderCards isHistory={true} orders={[]} />
 		</section>
 	);
 }

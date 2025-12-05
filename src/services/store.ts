@@ -1,19 +1,23 @@
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
-import { configureStore } from '@reduxjs/toolkit';
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import ingredientsReducer from './burger/ingredients';
 import burgerConstructorReducer from './burger/constructor';
 import orderReducer from './order';
 import userReducer from './user';
 import authReducer from './auth';
+import orderFeedReducer, { orderFeedWebSocketMiddleware } from './order-feed';
 
 export const store = configureStore({
-	reducer: {
+	reducer: combineReducers({
 		ingredientsReducer,
 		burgerConstructorReducer,
 		orderReducer,
 		userReducer,
 		authReducer,
-	},
+		orderFeedReducer,
+	}),
+	middleware: getDefaultMiddleware =>
+		getDefaultMiddleware({ serializableCheck: false }).concat(orderFeedWebSocketMiddleware),
 	devTools: process.env.NODE_ENV === 'development',
 });
 

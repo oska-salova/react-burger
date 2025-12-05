@@ -1,4 +1,3 @@
-import { BurgerIngredient } from './burger';
 import { User } from './user';
 
 export enum OrderStatus {
@@ -7,7 +6,7 @@ export enum OrderStatus {
 }
 
 export interface Order {
-	ingredients: BurgerIngredient[];
+	ingredients: string[];
 	_id: string;
 	owner: User & {
 		createdAt: string;

@@ -1,9 +1,11 @@
-import { OrderStatus } from '../../../model/order';
-import { DEBUG_ORDERS } from './debug';
+import { Order, OrderStatus } from '../../../model/order';
 import styles from './order-board.module.css';
 
-function OrderBoard() {
-	const orders = DEBUG_ORDERS;
+interface OrderBoardProps {
+	orders: Order[];
+}
+
+function OrderBoard({ orders }: OrderBoardProps) {
 	const readyOrders = orders.filter(order => order.status === OrderStatus.done).slice(0, 10);
 	const progressOrders = orders
 		.filter(order => order.status === OrderStatus.in_progress)
