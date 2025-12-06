@@ -91,6 +91,7 @@ function App() {
 				<Routes location={backgroundLocation || location}>
 					<Route path={AppRoutes.Home} element={<HomePage />} />
 					<Route path={AppRoutes.Ingredient} element={<IngredientPage />} />
+					<Route path={AppRoutes.OrderFeed} element={<OrderFeedPage />} />
 					<Route
 						path={AppRoutes.Login}
 						element={getProtectedRouteElement(<LoginPage />, false)}
@@ -106,10 +107,6 @@ function App() {
 					<Route
 						path={AppRoutes.ResetPassword}
 						element={getProtectedRouteElement(<ResetPasswordPage />, false)}
-					/>
-					<Route
-						path={AppRoutes.OrderFeed}
-						element={getProtectedRouteElement(<OrderFeedPage />, true)}
 					/>
 					<Route
 						path={AppRoutes.Profile}
