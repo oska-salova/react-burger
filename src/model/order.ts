@@ -1,21 +1,15 @@
-import { User } from './user';
-
 export enum OrderStatus {
-	in_progress = 'in_progress',
+	pending = 'pending',
 	done = 'done',
+	created = 'created',
 }
 
 export interface Order {
 	ingredients: string[];
 	_id: string;
-	owner: User & {
-		createdAt: string;
-		updatedAt: string;
-	};
 	status: OrderStatus;
 	name: string;
 	createdAt: string;
 	updatedAt: string;
 	number: number;
-	price: number;
 }

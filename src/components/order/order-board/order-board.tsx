@@ -10,7 +10,7 @@ interface OrderBoardProps {
 function OrderBoard({ orders, totalOrders, totalTodayOrders }: OrderBoardProps) {
 	const readyOrders = orders.filter(order => order.status === OrderStatus.done).slice(0, 10);
 	const progressOrders = orders
-		.filter(order => order.status === OrderStatus.in_progress)
+		.filter(order => order.status === OrderStatus.pending)
 		.slice(0, 10);
 
 	const getOrdersQueueBlock = (ready = false) => {

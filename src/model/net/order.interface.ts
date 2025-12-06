@@ -6,7 +6,7 @@ export interface RegisterOrderResponse extends SuccessResponse {
 	order: Order;
 }
 
-export interface OrderFeedSocketMessage extends SuccessResponse {
+export interface OrdersSocketMessage extends SuccessResponse {
 	orders: Order[];
 	total: number;
 	totalToday: number;

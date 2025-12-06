@@ -9,6 +9,7 @@ import {
 
 import { RootState } from '../store';
 import { refreshToken } from '../../net/api';
+import { token } from '../../model/token';
 
 type WebSocketActions<TReceiveMessage, TSendMessage> = {
 	connect: ActionCreatorWithPayload<string>;
@@ -51,7 +52,7 @@ export function createWebSocketMiddleware<TReceiveMessage, TSendMessage>(
 				}
 
 				url = action.payload;
-				socket = new WebSocket(url);
+				socket = new WebSocket(generateWSFullUrl(url, withTokenRefresh));
 				isConnected = true;
 
 				socket.onopen = event => {
@@ -74,13 +75,8 @@ export function createWebSocketMiddleware<TReceiveMessage, TSendMessage>(
 					store.dispatch(onMessageReceived(data));
 
 					if (withTokenRefresh && data.message === 'Invalid or missing token') {
-						refreshToken().then(refreshData => {
-							const wssUrl = new URL(url);
-							wssUrl.searchParams.set(
-								'token',
-								refreshData.accessToken.replace('Bearer ', ''),
-							);
-							store.dispatch(connect(wssUrl.toString()));
+						refreshToken().then(() => {
+							store.dispatch(connect(generateWSFullUrl(url, withTokenRefresh)));
 						});
 
 						store.dispatch(disconnect());
@@ -116,4 +112,15 @@ export function createWebSocketMiddleware<TReceiveMessage, TSendMessage>(
 
 			return next(action);
 		}) as Middleware;
+}
+
+function generateWSFullUrl(url: string, withTokenRefresh: boolean): string {
+	const wssUrl = new URL(url);
+
+	if (withTokenRefresh) {
+		const accessToken = token.getAccessToken() ?? '';
+		wssUrl.searchParams.set('token', accessToken.replace('Bearer ', ''));
+	}
+
+	return wssUrl.toString();
 }

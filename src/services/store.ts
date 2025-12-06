@@ -6,6 +6,7 @@ import orderReducer from './order';
 import userReducer from './user';
 import authReducer from './auth';
 import orderFeedReducer, { orderFeedWebSocketMiddleware } from './order-feed';
+import orderHistoryReducer, { orderHistoryWebSocketMiddleware } from './order-history';
 
 export const store = configureStore({
 	reducer: combineReducers({
@@ -15,9 +16,13 @@ export const store = configureStore({
 		userReducer,
 		authReducer,
 		orderFeedReducer,
+		orderHistoryReducer,
 	}),
 	middleware: getDefaultMiddleware =>
-		getDefaultMiddleware({ serializableCheck: false }).concat(orderFeedWebSocketMiddleware),
+		getDefaultMiddleware({ serializableCheck: false }).concat([
+			orderFeedWebSocketMiddleware,
+			orderHistoryWebSocketMiddleware,
+		]),
 	devTools: process.env.NODE_ENV === 'development',
 });
 

@@ -7,7 +7,8 @@ import { useAppSelector } from '../../../../services/store';
 import { BurgerIngredient } from '../../../../model/burger';
 
 const orderStatusDict: Record<OrderStatus, string> = {
-	[OrderStatus.in_progress]: 'В работе',
+	[OrderStatus.created]: 'Оформлен',
+	[OrderStatus.pending]: 'В работе',
 	[OrderStatus.done]: 'Выполнен',
 };
 

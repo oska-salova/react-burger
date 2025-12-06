@@ -1,13 +1,12 @@
 import OrderCards from '../../components/order/order-cards/order-cards';
 import OrderBoard from '../../components/order/order-board/order-board';
 import styles from './order-feed.module.css';
-import { useDispatch } from 'react-redux';
 import { orderFeedSlice } from '../../services/order-feed';
 import { useEffect } from 'react';
-import { useAppSelector } from '../../services/store';
+import { useAppDispatch, useAppSelector } from '../../services/store';
 
 function OrderFeedPage() {
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 	const { orders, status, error, totalOrders, totalTodayOrders } = useAppSelector(
 		state => state.orderFeedReducer,
 	);
@@ -20,7 +19,7 @@ function OrderFeedPage() {
 	}, []);
 
 	if (status !== 'online' || !orders) {
-		return <p className="text text_type_main-default m-2">Идет загрузка летны заказов...</p>;
+		return <p className="text text_type_main-default m-2">Идет загрузка ленты заказов...</p>;
 	}
 
 	if (error) {

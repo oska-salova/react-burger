@@ -3,24 +3,20 @@ import { createWebSocketMiddleware } from './middleware/socket-middleware';
 import { Order } from '../model/order';
 import { OrdersSocketMessage } from '../model/net/order.interface';
 
-type OrderFeedState = {
+type OrderHistoryState = {
 	status: 'offline' | 'connecting' | 'online';
 	orders: Order[] | null;
 	error: string | null;
-	totalOrders: number;
-	totalTodayOrders: number;
 };
 
-const initialState: OrderFeedState = {
+const initialState: OrderHistoryState = {
 	status: 'offline',
 	orders: null,
 	error: null,
-	totalOrders: 0,
-	totalTodayOrders: 0,
 };
 
-export const orderFeedSlice = createSlice({
-	name: 'order/feed',
+export const orderHistorySlice = createSlice({
+	name: 'order/history',
 	initialState,
 	reducers: {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -47,19 +43,25 @@ export const orderFeedSlice = createSlice({
 		onError(state, _action: PayloadAction<Event>) {
 			state.error = 'Connection error';
 		},
-		onMessageReceived(state, { payload }: PayloadAction<OrdersSocketMessage>) {
-			state.orders = payload.orders;
-			state.totalOrders = payload.total;
-			state.totalTodayOrders = payload.totalToday;
+		onMessageReceived: {
+			reducer: (state, { payload }: PayloadAction<OrdersSocketMessage>) => {
+				state.orders = payload.orders;
+			},
+			prepare: (message: OrdersSocketMessage) => {
+				const orders = message.orders.sort((a, b) => {
+					return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+				});
+				return { payload: { ...message, orders: orders } };
+			},
 		},
 	},
 });
 
-export const orderFeedWebSocketMiddleware = createWebSocketMiddleware<OrdersSocketMessage, void>(
-	orderFeedSlice.actions,
+export const orderHistoryWebSocketMiddleware = createWebSocketMiddleware<OrdersSocketMessage, void>(
+	orderHistorySlice.actions,
 	{
-		withTokenRefresh: false,
+		withTokenRefresh: true,
 	},
 );
 
-export default orderFeedSlice.reducer;
+export default orderHistorySlice.reducer;
