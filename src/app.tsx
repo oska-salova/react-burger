@@ -12,7 +12,6 @@ import RegisterPage from './pages/auth/register';
 import { useAppDispatch, useAppSelector } from './services/store';
 import UserPage from './pages/user/user';
 import OrderHistoryPage from './pages/order/order-history';
-import OrderDetailsPage from './pages/order/order-details';
 import { IngredientPage } from './pages/ingredient/ingredient';
 import ProtectedRouteElement from './components/protected-route';
 import { ReactElement, useEffect, useState } from 'react';
@@ -23,6 +22,7 @@ import { orderSlice } from './services/order';
 import Modal from './components/modal/modal';
 import IngredientDetails from './components/burger-ingredients/ingredient-details/ingredient-details';
 import { getIngredients } from './services/burger/ingredients';
+import { OrderInfoPage } from './pages/order/order-info-page/order-info-page';
 
 function App() {
 	const location = useLocation();
@@ -92,6 +92,7 @@ function App() {
 					<Route path={AppRoutes.Home} element={<HomePage />} />
 					<Route path={AppRoutes.Ingredient} element={<IngredientPage />} />
 					<Route path={AppRoutes.OrderFeed} element={<OrderFeedPage />} />
+					<Route path={`${AppRoutes.OrderFeed}/:number`} element={<OrderInfoPage />} />
 					<Route
 						path={AppRoutes.Login}
 						element={getProtectedRouteElement(<LoginPage />, false)}
@@ -114,12 +115,12 @@ function App() {
 					>
 						<Route index element={<UserPage />} />
 						<Route path={ProfileRoutes.Orders} element={<OrderHistoryPage />} />
-						<Route
-							path={`${ProfileRoutes.Orders}/:number`}
-							element={<OrderDetailsPage />}
-						/>
 						<Route path={AppRoutes.NotFound} element={<NotFoundPage />} />
 					</Route>
+					<Route
+						path={`${AppRoutes.Profile}/${ProfileRoutes.Orders}/:number`}
+						element={<OrderInfoPage />}
+					/>
 					<Route path={AppRoutes.NotFound} element={<NotFoundPage />} />
 				</Routes>
 				{backgroundLocation && (
@@ -129,6 +130,22 @@ function App() {
 							element={
 								<Modal header="Детали ингредиента">
 									<IngredientDetails />
+								</Modal>
+							}
+						/>
+						<Route
+							path={`${AppRoutes.Profile}/${ProfileRoutes.Orders}/:number`}
+							element={
+								<Modal>
+									<OrderInfoPage />
+								</Modal>
+							}
+						/>
+						<Route
+							path={`${AppRoutes.OrderFeed}/:number`}
+							element={
+								<Modal>
+									<OrderInfoPage />
 								</Modal>
 							}
 						/>

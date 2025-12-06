@@ -48,9 +48,9 @@ export const orderFeedSlice = createSlice({
 			state.error = 'Connection error';
 		},
 		onMessageReceived(state, { payload }: PayloadAction<OrdersSocketMessage>) {
-			state.orders = payload.orders;
-			state.totalOrders = payload.total;
-			state.totalTodayOrders = payload.totalToday;
+			state.orders = payload.orders ?? null;
+			state.totalOrders = payload.total ?? 0;
+			state.totalTodayOrders = payload.totalToday ?? 0;
 		},
 	},
 });

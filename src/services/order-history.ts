@@ -45,10 +45,10 @@ export const orderHistorySlice = createSlice({
 		},
 		onMessageReceived: {
 			reducer: (state, { payload }: PayloadAction<OrdersSocketMessage>) => {
-				state.orders = payload.orders;
+				state.orders = payload.orders ?? null;
 			},
 			prepare: (message: OrdersSocketMessage) => {
-				const orders = message.orders.sort((a, b) => {
+				const orders = message.orders?.sort((a, b) => {
 					return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
 				});
 				return { payload: { ...message, orders: orders } };

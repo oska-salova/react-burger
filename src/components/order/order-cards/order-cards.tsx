@@ -2,6 +2,7 @@ import styles from './order-cards.module.css';
 import { Order } from '../../../model/order';
 import OrderCard from './order-card/order-card';
 import { useLayoutEffect, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface OrderCardsProps {
 	orders: Order[];
@@ -9,13 +10,14 @@ interface OrderCardsProps {
 }
 
 function OrderCards({ orders, isHistory }: OrderCardsProps) {
+	const navigate = useNavigate();
+	const location = useLocation();
 	const cardsRef = useRef<HTMLUListElement | null>(null);
 
 	const handleOrderClick = (order: Order) => {
-		console.log('** Order click', order);
-		// navigate(AppRoutes.OrderFeed.replace(':id', order._id), {
-		// 	state: { backgroundLocation: location },
-		// });
+		navigate(`${location.pathname}/${order.number}`, {
+			state: { backgroundLocation: location },
+		});
 	};
 
 	const updateTopPosition = () => {

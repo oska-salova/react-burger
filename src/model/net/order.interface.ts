@@ -7,7 +7,8 @@ export interface RegisterOrderResponse extends SuccessResponse {
 }
 
 export interface OrdersSocketMessage extends SuccessResponse {
-	orders: Order[];
-	total: number;
-	totalToday: number;
+	orders?: Order[];
+	total?: number;
+	totalToday?: number;
+	message?: string;
 }
