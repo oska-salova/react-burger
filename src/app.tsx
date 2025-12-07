@@ -32,6 +32,7 @@ function App() {
 	const accessToken = token.getAccessToken();
 	const [isUserChecked, setIsUserChecked] = useState(false);
 	const orderState = useAppSelector(state => state.orderReducer);
+	const ingredients = useAppSelector(state => state.ingredientsReducer.ingredients);
 
 	const getProtectedRouteElement = (element: ReactElement, needsAuth: boolean): ReactElement => {
 		return <ProtectedRouteElement element={element} needsAuth={needsAuth} />;
@@ -79,7 +80,7 @@ function App() {
 		}
 	}, [location.pathname]);
 
-	if (!isUserChecked) {
+	if (!isUserChecked || !ingredients.length) {
 		return <p className="text text_type_main-default">App data preparing...</p>;
 	}
 

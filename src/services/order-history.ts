@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { createWebSocketMiddleware } from './middleware/socket-middleware';
-import { Order } from '../model/order';
+import { Order, filterValidOrders } from '../model/order';
 import { OrdersSocketMessage } from '../model/net/order.interface';
 
 type OrderHistoryState = {
@@ -48,7 +48,11 @@ export const orderHistorySlice = createSlice({
 				state.orders = payload.orders ?? null;
 			},
 			prepare: (message: OrdersSocketMessage) => {
-				const orders = message.orders?.sort((a, b) => {
+				if (!message.orders) {
+					return { payload: { ...message } };
+				}
+
+				const orders = filterValidOrders(message.orders).sort((a, b) => {
 					return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
 				});
 				return { payload: { ...message, orders: orders } };

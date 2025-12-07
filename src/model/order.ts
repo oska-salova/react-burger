@@ -37,3 +37,16 @@ export interface RegistrationOrder {
 	number: number;
 	price: number;
 }
+
+export function filterValidOrders(orders: Order[]): Order[] {
+	const orderStatuses = Object.values(OrderStatus);
+	return orders.filter(
+		order =>
+			order._id &&
+			order.name &&
+			order.createdAt &&
+			orderStatuses.includes(order.status) &&
+			order.ingredients &&
+			order.ingredients.every(ingredient => !!ingredient),
+	);
+}

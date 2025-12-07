@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { createWebSocketMiddleware } from './middleware/socket-middleware';
-import { Order } from '../model/order';
+import { Order, filterValidOrders } from '../model/order';
 import { OrdersSocketMessage } from '../model/net/order.interface';
 
 type OrderFeedState = {
@@ -47,10 +47,18 @@ export const orderFeedSlice = createSlice({
 		onError(state, _action: PayloadAction<Event>) {
 			state.error = 'Connection error';
 		},
-		onMessageReceived(state, { payload }: PayloadAction<OrdersSocketMessage>) {
-			state.orders = payload.orders ?? null;
-			state.totalOrders = payload.total ?? 0;
-			state.totalTodayOrders = payload.totalToday ?? 0;
+		onMessageReceived: {
+			reducer: (state, { payload }: PayloadAction<OrdersSocketMessage>) => {
+				state.orders = payload.orders ?? null;
+				state.totalOrders = payload.total ?? 0;
+				state.totalTodayOrders = payload.totalToday ?? 0;
+			},
+			prepare: (message: OrdersSocketMessage) => {
+				if (!message.orders) {
+					return { payload: { ...message } };
+				}
+				return { payload: { ...message, orders: filterValidOrders(message.orders) } };
+			},
 		},
 	},
 });
