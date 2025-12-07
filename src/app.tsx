@@ -138,10 +138,7 @@ function App() {
 							path={`${AppRoutes.Profile}/${ProfileRoutes.Orders}/:number`}
 							element={
 								<Modal header={`#${location.state.orderNumber}`}>
-									<OrderInfo
-										orderNumber={location.state.orderNumber}
-										inModal={true}
-									/>
+									<OrderInfo orderNumber={location.state.orderNumber} />
 								</Modal>
 							}
 						/>
@@ -149,10 +146,7 @@ function App() {
 							path={`${AppRoutes.OrderFeed}/:number`}
 							element={
 								<Modal header={`#${location.state.orderNumber}`}>
-									<OrderInfo
-										orderNumber={location.state.orderNumber}
-										inModal={true}
-									/>
+									<OrderInfo orderNumber={location.state.orderNumber} />
 								</Modal>
 							}
 						/>

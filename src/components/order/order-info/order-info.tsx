@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import styles from './order-info.module.css';
 import { useAppDispatch, useAppSelector } from '../../../services/store';
 import { getOrderByNumber } from '../../../services/order';
@@ -9,10 +9,11 @@ import { CurrencyIcon, FormattedDate } from '@ya.praktikum/react-developer-burge
 
 interface OrderInfoProps {
 	orderNumber: number;
-	inModal?: boolean;
 }
 
-const OrderInfo = ({ orderNumber, inModal }: OrderInfoProps) => {
+type CombinedOrderIngredient = { ingredient: BurgerIngredient; amount: number };
+
+const OrderInfo = ({ orderNumber }: OrderInfoProps) => {
 	const dispatch = useAppDispatch();
 	const feedOrder = useAppSelector(state =>
 		state.orderFeedReducer.orders?.find(order => order.number === orderNumber),
@@ -23,7 +24,7 @@ const OrderInfo = ({ orderNumber, inModal }: OrderInfoProps) => {
 	const oldRegisteredOrder = useAppSelector(state => state.orderReducer.orders[orderNumber]);
 	const order = feedOrder ?? historyOrder ?? oldRegisteredOrder ?? null;
 	const allIngredients = useAppSelector(state => state.ingredientsReducer.ingredients);
-	const [orderIngredients, setOrderIngredients] = useState<BurgerIngredient[]>([]);
+	const [orderIngredients, setOrderIngredients] = useState<CombinedOrderIngredient[]>([]);
 
 	const isOrderLoading = useAppSelector(state => state.orderReducer.ordersPending);
 	const isOrderLoadingError = useAppSelector(state => state.orderReducer.ordersError);
@@ -43,15 +44,31 @@ const OrderInfo = ({ orderNumber, inModal }: OrderInfoProps) => {
 
 	useEffect(() => {
 		if (order && allIngredients.length) {
-			const ingredients = order.ingredients.flatMap(ingredientId =>
-				allIngredients.filter(ingredient => ingredient._id === ingredientId),
-			);
-			setOrderIngredients(ingredients);
+			const calculatedOrderIngredients: CombinedOrderIngredient[] = [];
+			order.ingredients.forEach(ingredientId => {
+				const foundCombinedIngredient = calculatedOrderIngredients.find(
+					combinedIngredient => combinedIngredient.ingredient._id === ingredientId,
+				);
+				if (foundCombinedIngredient) {
+					foundCombinedIngredient.amount++;
+				} else {
+					calculatedOrderIngredients.push({
+						ingredient: allIngredients.find(
+							ingredient => ingredient._id === ingredientId,
+						) as BurgerIngredient,
+						amount: 1,
+					});
+				}
+			});
+			setOrderIngredients(calculatedOrderIngredients);
 		}
 	}, [order, allIngredients]);
 
 	const burgerPrice = useMemo<number>(() => {
-		return orderIngredients.reduce((price, ingredient) => price + ingredient.price, 0);
+		return orderIngredients.reduce(
+			(price, combinedIngredient) => price + combinedIngredient.ingredient.price,
+			0,
+		);
 	}, [orderIngredients]);
 
 	const onRefChange = useCallback((node: HTMLUListElement) => {
@@ -105,16 +122,22 @@ const OrderInfo = ({ orderNumber, inModal }: OrderInfoProps) => {
 				<div className={styles.ingredientsBlock}>
 					<p className="text text_type_main-medium">Состав:</p>
 					<ul className={styles.ingredients} ref={onRefChange}>
-						{orderIngredients.map((ingredient, index) => (
+						{orderIngredients.map((combinedIngredient, index) => (
 							<li key={index} className={styles.ingredient}>
 								<div className={styles.ingredientName}>
 									<IngredientCircle
-										ingredientId={ingredient._id}
-										imageUrl={ingredient.image_mobile}
+										ingredientId={combinedIngredient.ingredient._id}
+										imageUrl={combinedIngredient.ingredient.image_mobile}
 									/>
-									<p className="text text_type_main-default">{ingredient.name}</p>
+									<p className="text text_type_main-default">
+										{combinedIngredient.ingredient.name}
+									</p>
 								</div>
-								{getPriceBlock('1 x ' + ingredient.price)}
+								{getPriceBlock(
+									combinedIngredient.amount +
+										' x ' +
+										combinedIngredient.ingredient.price,
+								)}
 							</li>
 						))}
 					</ul>
