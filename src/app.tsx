@@ -23,6 +23,7 @@ import Modal from './components/modal/modal';
 import IngredientDetails from './components/burger-ingredients/ingredient-details/ingredient-details';
 import { getIngredients } from './services/burger/ingredients';
 import { OrderInfoPage } from './pages/order/order-info-page/order-info-page';
+import OrderInfo from './components/order/order-info/order-info';
 
 function App() {
 	const location = useLocation();
@@ -73,7 +74,7 @@ function App() {
 	}, [location.pathname, orderState.registration, orderState.preRegistration]);
 
 	useEffect(() => {
-		if (orderState.error || orderState.order) {
+		if (orderState.error || orderState.registrationOrder) {
 			dispatch(orderSlice.actions.reset());
 		}
 	}, [location.pathname]);
@@ -136,16 +137,22 @@ function App() {
 						<Route
 							path={`${AppRoutes.Profile}/${ProfileRoutes.Orders}/:number`}
 							element={
-								<Modal>
-									<OrderInfoPage />
+								<Modal header={`#${location.state.orderNumber}`}>
+									<OrderInfo
+										orderNumber={location.state.orderNumber}
+										inModal={true}
+									/>
 								</Modal>
 							}
 						/>
 						<Route
 							path={`${AppRoutes.OrderFeed}/:number`}
 							element={
-								<Modal>
-									<OrderInfoPage />
+								<Modal header={`#${location.state.orderNumber}`}>
+									<OrderInfo
+										orderNumber={location.state.orderNumber}
+										inModal={true}
+									/>
 								</Modal>
 							}
 						/>

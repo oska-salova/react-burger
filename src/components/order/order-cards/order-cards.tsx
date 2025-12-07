@@ -16,7 +16,7 @@ function OrderCards({ orders, isHistory }: OrderCardsProps) {
 
 	const handleOrderClick = (order: Order) => {
 		navigate(`${location.pathname}/${order.number}`, {
-			state: { backgroundLocation: location },
+			state: { backgroundLocation: location, orderNumber: order.number },
 		});
 	};
 

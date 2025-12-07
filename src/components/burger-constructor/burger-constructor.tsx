@@ -80,20 +80,24 @@ function BurgerConstructor() {
 	};
 
 	useEffect(() => {
-		if (orderState.error || orderState.order) {
+		if (orderState.error || orderState.registrationOrder) {
 			openModal();
 
-			if (orderState.order) {
+			if (orderState.registrationOrder) {
 				dispatch(burgerConstructorSlice.actions.clear());
 			}
 		}
 	}, [orderState]);
 
 	useEffect(() => {
-		if (isModalOpen && (orderState.error || orderState.order)) {
+		if (isModalOpen && (orderState.error || orderState.registrationOrder)) {
 			setCreateOrderResultViewed(true);
 		}
-		if (isCreateOrderResultViewed && !isModalOpen && (orderState.error || orderState.order)) {
+		if (
+			isCreateOrderResultViewed &&
+			!isModalOpen &&
+			(orderState.error || orderState.registrationOrder)
+		) {
 			dispatch(orderSlice.actions.reset());
 			setCreateOrderResultViewed(false);
 		}

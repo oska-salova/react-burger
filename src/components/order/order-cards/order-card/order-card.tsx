@@ -1,16 +1,10 @@
 import { FC, memo, useMemo } from 'react';
 import styles from './order-card.module.css';
-import { Order, OrderStatus } from '../../../../model/order';
+import { Order, OrderStatus, orderStatusDict } from '../../../../model/order';
 import { CurrencyIcon, FormattedDate } from '@ya.praktikum/react-developer-burger-ui-components';
 import IngredientCircle from '../ingredient-circle/ingredient-circle';
 import { useAppSelector } from '../../../../services/store';
 import { BurgerIngredient } from '../../../../model/burger';
-
-const orderStatusDict: Record<OrderStatus, string> = {
-	[OrderStatus.created]: 'Оформлен',
-	[OrderStatus.pending]: 'В работе',
-	[OrderStatus.done]: 'Выполнен',
-};
 
 interface OrderCardProps {
 	order: Order;

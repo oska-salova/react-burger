@@ -5,7 +5,7 @@ import { useAppSelector } from '../../../services/store';
 
 const OrderDetails = () => {
 	const isLoading = useAppSelector(state => state.orderReducer.registration);
-	const orderNumber = useAppSelector(state => state.orderReducer.order?.number);
+	const orderNumber = useAppSelector(state => state.orderReducer.registrationOrder?.number);
 	const error = useAppSelector(state => state.orderReducer.error);
 
 	const getOrderStatus = (status: OrderStatus) => (
