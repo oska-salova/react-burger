@@ -16,7 +16,7 @@ export const OrderInfoPage = () => {
 
 	return (
 		<div className={`flex-center flex-columns ${styles.page}`}>
-			<div className={`${styles.orderNumber} mb-5`}>
+			<div className={styles.orderNumber}>
 				<p className="text text_type_digits-default">#{orderNumber}</p>
 			</div>
 
