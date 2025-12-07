@@ -121,7 +121,7 @@ function App() {
 					</Route>
 					<Route
 						path={`${AppRoutes.Profile}/${ProfileRoutes.Orders}/:number`}
-						element={<OrderInfoPage />}
+						element={getProtectedRouteElement(<OrderInfoPage />, true)}
 					/>
 					<Route path={AppRoutes.NotFound} element={<NotFoundPage />} />
 				</Routes>
