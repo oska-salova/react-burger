@@ -1,0 +1,11 @@
+.page {
+	min-width: 640px;
+	min-height: 600px;
+}
+
+.orderNumber {
+	height: 64px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}

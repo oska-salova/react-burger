@@ -1,4 +1,6 @@
 .page {
 	min-width: 600px;
 	min-height: 600px;
+	max-width: 800px;
+	margin: 0 auto;
 }

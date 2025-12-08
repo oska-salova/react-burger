@@ -6,7 +6,7 @@
 	width: 720px;
 	height: fit-content;
 	max-width: calc(100vw - 80px);
-	max-height: calc(100vw - 80px);
+	max-height: calc(100vh - 100px);
 	background-color: var(--color-modal-bg);
 	border-radius: 40px;
 	z-index: 1;
