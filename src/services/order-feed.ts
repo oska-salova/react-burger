@@ -11,7 +11,7 @@ type OrderFeedState = {
 	totalTodayOrders: number;
 };
 
-const initialState: OrderFeedState = {
+export const initialState: OrderFeedState = {
 	status: 'offline',
 	orders: null,
 	error: null,
