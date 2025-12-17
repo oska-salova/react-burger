@@ -113,11 +113,16 @@ function BurgerConstructor() {
 			<section className={`${styles.burgerConstructor}`}>
 				<section className={styles.burger}>
 					<ConstructorBun type="top" />
-					<ul className={styles.customIngredients} ref={customIngredientsRef}>
+					<ul
+						className={styles.customIngredients}
+						ref={customIngredientsRef}
+						data-testid="constructor-filling-ul"
+					>
 						{customIngredientItems.map((ingredient, index) => (
 							<li
 								key={ingredient?.uuid ?? 'empty-filling'}
 								className={styles.ingredient}
+								data-testid={`constructor-filling-item-${ingredient?.uuid ?? 'empty-filling'}`}
 							>
 								<ConstructorFilling ingredient={ingredient} index={index} />
 							</li>
@@ -137,6 +142,7 @@ function BurgerConstructor() {
 							size="large"
 							onClick={handleOrderButtonClick}
 							disabled={orderState.registration}
+							data-testid="register-order-btn"
 						>
 							{orderState.registration ? 'Оформляем ...' : 'Оформить заказ'}
 						</Button>

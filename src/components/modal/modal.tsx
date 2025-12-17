@@ -36,7 +36,7 @@ const Modal: FC<ModalPropsType> = ({ children, header, onClose }) => {
 
 	return createPortal(
 		<>
-			<div className={styles.modal}>
+			<div className={styles.modal} data-testid="modal">
 				<ModalHeader header={header} onClose={onClose} />
 				<div className={styles.body}>{children}</div>
 			</div>
