@@ -1,6 +1,8 @@
+import { configureStore } from '@reduxjs/toolkit';
 import { OrdersSocketMessage } from '../model/net/order.interface';
+import { rootReducer, store as appStore } from './store';
 import { OrderStatus } from '../model/order';
-import reducer, { initialState, orderHistorySlice } from './order-history';
+import { orderHistorySlice } from './order-history';
 
 const testMessage: OrdersSocketMessage = {
 	success: true,
@@ -18,79 +20,122 @@ const testMessage: OrdersSocketMessage = {
 };
 
 describe('Order history reducers', () => {
-	it('should return correct initial state', () => {
-		expect(reducer(undefined, { type: 'unknown' })).toEqual({
-			status: 'offline',
-			orders: null,
-			error: null,
-		});
+	let store: typeof appStore;
+	let rootInitialState: ReturnType<typeof rootReducer>;
+
+	beforeEach(() => {
+		store = configureStore({ reducer: rootReducer });
+		rootInitialState = store.getState();
 	});
 
 	it("should set status to 'connecting' on connect", () => {
-		const newState = reducer(initialState, orderHistorySlice.actions.connect(''));
+		const newState = rootReducer(rootInitialState, orderHistorySlice.actions.connect(''));
 		expect(newState).toEqual({
-			...initialState,
-			status: 'connecting',
+			...rootInitialState,
+			orderHistoryReducer: {
+				...rootInitialState.orderHistoryReducer,
+				status: 'connecting',
+			},
 		});
 	});
 
 	it('should return to initial state on disconnect', () => {
-		const curState: typeof initialState = {
-			status: 'online',
-			orders: [],
-			error: null,
+		const curState: typeof rootInitialState = {
+			...rootInitialState,
+			orderHistoryReducer: {
+				...rootInitialState.orderHistoryReducer,
+				status: 'online',
+				orders: [],
+			},
 		};
-		const newState = reducer(curState, orderHistorySlice.actions.disconnect());
-		expect(newState).toEqual(initialState);
+		const newState = rootReducer(curState, orderHistorySlice.actions.disconnect());
+		expect(newState).toEqual(rootInitialState);
 	});
 
 	it('should not change state on sendMessage', () => {
-		const curState: typeof initialState = {
-			status: 'online',
-			orders: [],
-			error: null,
+		const curState: typeof rootInitialState = {
+			...rootInitialState,
+			orderHistoryReducer: {
+				...rootInitialState.orderHistoryReducer,
+				status: 'online',
+				orders: [],
+			},
 		};
-		const newState = reducer(curState, orderHistorySlice.actions.sendMessage());
+		const newState = rootReducer(curState, orderHistorySlice.actions.sendMessage());
 		expect(newState).toEqual(curState);
 	});
 
 	it("should set status to 'online' on onConnected", () => {
-		const newState = reducer(
-			initialState,
+		const newState = rootReducer(
+			rootInitialState,
 			orderHistorySlice.actions.onConnected(new Event('')),
 		);
-		expect(newState).toEqual({ ...initialState, status: 'online' });
+		expect(newState).toEqual({
+			...rootInitialState,
+			orderHistoryReducer: {
+				...rootInitialState.orderHistoryReducer,
+				status: 'online',
+			},
+		});
 	});
 
 	it("should set status to 'offline' and reset error on onDisconnected", () => {
-		const curState: typeof initialState = {
-			...initialState,
-			status: 'online',
-			error: 'test error',
+		const curState: typeof rootInitialState = {
+			...rootInitialState,
+			orderHistoryReducer: {
+				...rootInitialState.orderHistoryReducer,
+				status: 'online',
+				error: 'test error',
+			},
 		};
-		const newState = reducer(
+		const newState = rootReducer(
 			curState,
 			orderHistorySlice.actions.onDisconnected(new CloseEvent('')),
 		);
-		expect(newState).toEqual({ ...curState, status: 'offline', error: null });
+		expect(newState).toEqual({
+			...curState,
+			orderHistoryReducer: {
+				...rootInitialState.orderHistoryReducer,
+				status: 'offline',
+				error: null,
+			},
+		});
 	});
 
 	it("should set error to 'Connection error' on onError", () => {
-		const newState = reducer(initialState, orderHistorySlice.actions.onError(new Event('')));
-		expect(newState).toEqual({ ...initialState, error: 'Connection error' });
+		const newState = rootReducer(
+			rootInitialState,
+			orderHistorySlice.actions.onError(new Event('')),
+		);
+		expect(newState).toEqual({
+			...rootInitialState,
+			orderHistoryReducer: {
+				...rootInitialState.orderHistoryReducer,
+				error: 'Connection error',
+			},
+		});
 	});
 
 	it('should set orders on onMessageReceived', () => {
-		const curState: typeof initialState = {
-			...initialState,
-			status: 'online',
+		const curState: typeof rootInitialState = {
+			...rootInitialState,
+			orderHistoryReducer: {
+				...rootInitialState.orderHistoryReducer,
+				status: 'online',
+			},
 		};
-		expect(curState.orders).toBeNull();
+		expect(curState.orderHistoryReducer.orders).toBeNull();
 
-		const newState = reducer(
+		const newState = rootReducer(
 			curState,
 			orderHistorySlice.actions.onMessageReceived(testMessage),
 		);
-		expect(newState.orders).toEqual(testMessage.orders);
+		expect(newState).toEqual({
+			...curState,
+			orderHistoryReducer: {
+				...curState.orderHistoryReducer,
+				orders: testMessage.orders,
+			},
+		});
 	});
 });

@@ -7,7 +7,7 @@ type SelectedIngredientsState = {
 	ingredients: ConstructorIngredient[];
 };
 
-const initialState: SelectedIngredientsState = {
+export const initialState: SelectedIngredientsState = {
 	bun: null,
 	ingredients: [],
 };

@@ -1,5 +1,7 @@
+import { configureStore } from '@reduxjs/toolkit';
 import { BurgerIngredient } from '../../model/burger';
-import reducer, { getIngredients } from './ingredients';
+import { rootReducer, store as appStore } from '../store';
+import { getIngredients, initialState as ingredientsInitialState } from './ingredients';
 
 const testIngredients: BurgerIngredient[] = [
 	{
@@ -47,60 +49,57 @@ const testIngredients: BurgerIngredient[] = [
 ];
 
 describe('Ingredients reducers', () => {
-	it('should return correct initial state', () => {
-		expect(reducer(undefined, { type: 'unknown' })).toEqual({
-			ingredients: [],
-			loading: false,
-			error: null,
-		});
+	let store: typeof appStore;
+	let rootInitialState: ReturnType<typeof rootReducer>;
+
+	beforeEach(() => {
+		store = configureStore({ reducer: rootReducer });
+		rootInitialState = store.getState();
 	});
 
 	it('should set received ingredients to store', () => {
-		const curState = {
-			ingredients: [],
-			loading: false,
-			error: null,
-		};
+		const prevState = rootInitialState;
 		const action = { type: getIngredients.fulfilled.type, payload: testIngredients };
-		const newState = reducer(curState, action);
+		expect(prevState.ingredientsReducer.ingredients).toEqual([]);
 
-		expect(newState.ingredients).toEqual([...testIngredients]);
-		expect(newState.loading).toBe(false);
-		expect(newState.error).toBeNull();
+		const newState = rootReducer(prevState, action);
+		expect(newState).toEqual({
+			...prevState,
+			ingredientsReducer: { ...ingredientsInitialState, ingredients: [...testIngredients] },
+		});
 	});
 
 	it('should add error to store when getIngredients fails', () => {
-		const curState = {
-			ingredients: [],
-			loading: false,
-			error: null,
-		};
+		const prevState = rootInitialState;
 		const errorMessage = 'get ingredients error';
 		const action = {
 			type: getIngredients.rejected.type,
 			payload: { message: errorMessage },
 			meta: { aborted: false },
 		};
-		const newState = reducer(curState, action);
+		expect(prevState.ingredientsReducer.error).toBeNull();
 
-		expect(newState.ingredients).toEqual([]);
-		expect(newState.loading).toBe(false);
-		expect(newState.error).toBe(errorMessage);
+		const newState = rootReducer(prevState, action);
+		expect(newState).toEqual({
+			...prevState,
+			ingredientsReducer: { ...ingredientsInitialState, error: errorMessage },
+		});
 	});
 
 	it('should set loading to true and reset ingredients when getIngredients is in progress', () => {
-		const curState = {
-			ingredients: testIngredients,
-			loading: false,
-			error: null,
+		const prevState = {
+			...rootInitialState,
+			ingredientsReducer: { ...ingredientsInitialState, ingredients: [...testIngredients] },
 		};
+		expect(prevState.ingredientsReducer.loading).toBe(false);
+
 		const action = {
 			type: getIngredients.pending.type,
 		};
-		const newState = reducer(curState, action);
-
-		expect(newState.ingredients).toEqual([]);
-		expect(newState.loading).toBe(true);
-		expect(newState.error).toBeNull;
+		const newState = rootReducer(prevState, action);
+		expect(newState).toEqual({
+			...prevState,
+			ingredientsReducer: { ...ingredientsInitialState, ingredients: [], loading: true },
+		});
 	});
 });

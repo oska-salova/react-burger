@@ -1,5 +1,7 @@
+import { configureStore } from '@reduxjs/toolkit';
+import { rootReducer, store as appStore } from './store';
 import { OrderStatus, RegistrationOrder } from '../model/order';
-import orderReducer, { createOrder, getOrderByNumber, initialState, orderSlice } from './order';
+import { createOrder, getOrderByNumber, orderSlice } from './order';
 
 const testRegistrationOrder: RegistrationOrder = {
 	_id: 'test-order-id',
@@ -34,84 +36,99 @@ const testRegistrationOrder: RegistrationOrder = {
 };
 
 describe('Order reducers', () => {
-	it('should return correct initial state', () => {
-		expect(orderReducer(undefined, { type: 'unknown' })).toEqual({
-			registrationOrder: null,
-			preRegistration: false,
-			registration: false,
-			error: null,
-			orders: {},
-			ordersPending: false,
-			ordersError: null,
-		});
+	let store: typeof appStore;
+	let rootInitialState: ReturnType<typeof rootReducer>;
+
+	beforeEach(() => {
+		store = configureStore({ reducer: rootReducer });
+		rootInitialState = store.getState();
 	});
 
 	it('should set preRegistration to true on initRegistration', () => {
-		const prevState = initialState;
-		const newState = orderReducer(prevState, orderSlice.actions.initRegistration());
+		const prevState = rootInitialState;
+		const newState = rootReducer(prevState, orderSlice.actions.initRegistration());
 
 		expect(newState).toEqual({
 			...prevState,
-			preRegistration: true,
+			orderReducer: {
+				...prevState.orderReducer,
+				preRegistration: true,
+			},
 		});
 	});
 
-	it('should reset to initialState on reset action', () => {
+	it('should reset to rootInitialState on reset action', () => {
 		const prevState = {
-			registrationOrder: testRegistrationOrder,
-			preRegistration: false,
-			registration: false,
-			error: null,
-			orders: {
-				233453: {
-					ingredients: ['643d69a5c3f7b9001cfa093c', '643d69a5c3f7b9001cfa093d'],
-					_id: 'test_order_id',
-					status: OrderStatus.done,
-					name: 'test order name',
-					number: 10265,
-					createdAt: '111',
-					updatedAt: '222',
+			...rootInitialState,
+			orderReducer: {
+				...rootInitialState.orderReducer,
+				registrationOrder: testRegistrationOrder,
+				orders: {
+					233453: {
+						ingredients: ['643d69a5c3f7b9001cfa093c', '643d69a5c3f7b9001cfa093d'],
+						_id: 'test_order_id',
+						status: OrderStatus.done,
+						name: 'test order name',
+						number: 10265,
+						createdAt: '111',
+						updatedAt: '222',
+					},
 				},
 			},
-			ordersPending: false,
-			ordersError: null,
 		};
-		const newState = orderReducer(prevState, orderSlice.actions.reset());
-
-		expect(newState).toEqual(initialState);
+		const newState = rootReducer(prevState, orderSlice.actions.reset());
+		expect(newState).toEqual(rootInitialState);
 	});
 
 	it('should set registrationOrder, add to orders, reset error/pending states when createOrder succeeded', () => {
-		const curState: typeof initialState = {
-			...initialState,
-			registration: true,
+		const curState: typeof rootInitialState = {
+			...rootInitialState,
+			orderReducer: {
+				...rootInitialState.orderReducer,
+				registration: true,
+			},
 		};
-		expect(curState.orders).toEqual({});
+		expect(curState.orderReducer.orders).toEqual({});
 
 		const action = {
 			type: createOrder.fulfilled.type,
 			payload: { name: 'order name', order: testRegistrationOrder },
 		};
-		const newState = orderReducer(curState, action);
-		expect(newState.registration).toBe(false);
-		expect(newState.error).toBeNull();
-		expect(newState.orders[action.payload.order.number]).toEqual({
-			ingredients: testRegistrationOrder.ingredients.map(ingredient => ingredient._id),
-			_id: testRegistrationOrder._id,
-			status: testRegistrationOrder.status,
-			name: testRegistrationOrder.name,
-			createdAt: testRegistrationOrder.createdAt,
-			updatedAt: testRegistrationOrder.updatedAt,
-			number: testRegistrationOrder.number,
+		const newState = rootReducer(curState, action);
+		expect(newState).toEqual({
+			...curState,
+			orderReducer: {
+				...curState.orderReducer,
+				registration: false,
+				error: null,
+				registrationOrder: action.payload.order,
+				orders: {
+					...curState.orderReducer.orders,
+					[action.payload.order.number]: {
+						ingredients: testRegistrationOrder.ingredients.map(
+							ingredient => ingredient._id,
+						),
+						_id: testRegistrationOrder._id,
+						status: testRegistrationOrder.status,
+						name: testRegistrationOrder.name,
+						createdAt: testRegistrationOrder.createdAt,
+						updatedAt: testRegistrationOrder.updatedAt,
+						number: testRegistrationOrder.number,
+					},
+				},
+			},
 		});
 	});
 
 	it('should set error message and reset pending state when createOrder failed', () => {
 		const curState = {
-			...initialState,
-			registration: true,
-			registrationOrder: testRegistrationOrder,
-			error: null,
+			...rootInitialState,
+			orderReducer: {
+				...rootInitialState.orderReducer,
+				registration: true,
+				registrationOrder: testRegistrationOrder,
+				error: null,
+			},
 		};
 		const errorMessage = 'createOrder error';
 		const action = {
@@ -119,45 +136,63 @@ describe('Order reducers', () => {
 			payload: { message: errorMessage },
 			meta: { aborted: false },
 		};
-		const newState = orderReducer(curState, action);
-		expect(newState.registrationOrder).toBeNull();
-		expect(newState.registration).toBe(false);
-		expect(newState.error).toBe(errorMessage);
+		const newState = rootReducer(curState, action);
+		expect(newState).toEqual({
+			...curState,
+			orderReducer: {
+				...curState.orderReducer,
+				registrationOrder: null,
+				registration: false,
+				error: errorMessage,
+			},
+		});
 	});
 
 	it('should reset to initial state when createOrder failed and order registration is already not in progress', () => {
 		const curState = {
-			...initialState,
-			registration: false,
-			registrationOrder: testRegistrationOrder,
-			error: null,
+			...rootInitialState,
+			orderReducer: {
+				...rootInitialState.orderReducer,
+				registration: false,
+				registrationOrder: testRegistrationOrder,
+				error: null,
+			},
 		};
-		expect(curState).not.toEqual(initialState);
+		expect(curState).not.toEqual(rootInitialState);
 		const errorMessage = 'createOrder error';
 		const action = {
 			type: createOrder.rejected.type,
 			payload: { message: errorMessage },
 			meta: { aborted: false },
 		};
-		const newState = orderReducer(curState, action);
-		expect(newState).toEqual(initialState);
+		const newState = rootReducer(curState, action);
+		expect(newState).toEqual(rootInitialState);
 	});
 
 	it('should set registration to true and reset order/error when createOrder is in progress', () => {
 		const curState = {
-			...initialState,
-			registration: false,
-			registrationOrder: testRegistrationOrder,
-			preRegistration: true,
+			...rootInitialState,
+			orderReducer: {
+				...rootInitialState.orderReducer,
+				registration: false,
+				registrationOrder: testRegistrationOrder,
+				preRegistration: true,
+			},
 		};
 		const action = {
 			type: createOrder.pending.type,
 		};
-		const newState = orderReducer(curState, action);
-		expect(newState.registration).toBe(true);
-		expect(newState.preRegistration).toBe(false);
-		expect(newState.error).toBe(null);
-		expect(newState.registrationOrder).toBe(null);
+		const newState = rootReducer(curState, action);
+		expect(newState).toEqual({
+			...curState,
+			orderReducer: {
+				...curState.orderReducer,
+				registrationOrder: null,
+				registration: true,
+				error: null,
+				preRegistration: false,
+			},
+		});
 	});
 
 	it('should add order when getOrderByNumber succeeded and order found', () => {
@@ -170,39 +205,57 @@ describe('Order reducers', () => {
 			updatedAt: testRegistrationOrder.updatedAt,
 			number: testRegistrationOrder.number,
 		};
-		const curState: typeof initialState = {
-			...initialState,
+		const curState: typeof rootInitialState = {
+			...rootInitialState,
 		};
-		expect(curState.orders).toEqual({});
+		expect(curState.orderReducer.orders).toEqual({});
 
 		const action = {
 			type: getOrderByNumber.fulfilled.type,
 			payload: foundOrder,
 		};
-		const newState = orderReducer(curState, action);
-		expect(newState.orders[action.payload.number]).toEqual(foundOrder);
+		const newState = rootReducer(curState, action);
+		expect(newState).toEqual({
+			...curState,
+			orderReducer: {
+				...curState.orderReducer,
+				orders: {
+					...curState.orderReducer.orders,
+					[action.payload.number]: foundOrder,
+				},
+			},
+		});
 	});
 
 	it('should not add order when getOrderByNumber succeeded and order was not found', () => {
 		const foundOrder = null;
-		const curState: typeof initialState = {
-			...initialState,
+		const curState: typeof rootInitialState = {
+			...rootInitialState,
 		};
-		expect(curState.orders).toEqual({});
+		expect(curState.orderReducer.orders).toEqual({});
 
 		const action = {
 			type: getOrderByNumber.fulfilled.type,
 			payload: foundOrder,
 		};
-		const newState = orderReducer(curState, action);
-		expect(newState.orders).toEqual({});
+		const newState = rootReducer(curState, action);
+		expect(newState).toEqual({
+			...curState,
+			orderReducer: {
+				...curState.orderReducer,
+				orders: {},
+			},
+		});
 	});
 
 	it('should set ordersError and reset ordersPending state when getOrderByNumber failed', () => {
 		const curState = {
-			...initialState,
-			ordersPending: true,
-			error: null,
+			...rootInitialState,
+			orderReducer: {
+				...rootInitialState.orderReducer,
+				ordersPending: true,
+				error: null,
+			},
 		};
 		const errorMessage = 'getOrderByNumber error';
 		const action = {
@@ -210,22 +263,37 @@ describe('Order reducers', () => {
 			payload: { message: errorMessage },
 			meta: { aborted: false },
 		};
-		const newState = orderReducer(curState, action);
-		expect(newState.ordersPending).toBe(false);
-		expect(newState.ordersError).toBe(errorMessage);
+		const newState = rootReducer(curState, action);
+		expect(newState).toEqual({
+			...curState,
+			orderReducer: {
+				...curState.orderReducer,
+				ordersPending: false,
+				ordersError: errorMessage,
+			},
+		});
 	});
 
 	it('should reset ordersError/ordersPending when getOrderByNumber is in progress', () => {
-		const curState: typeof initialState = {
-			...initialState,
-			ordersError: 'error',
-			ordersPending: false,
+		const curState: typeof rootInitialState = {
+			...rootInitialState,
+			orderReducer: {
+				...rootInitialState.orderReducer,
+				ordersError: 'error',
+				ordersPending: false,
+			},
 		};
 		const action = {
 			type: getOrderByNumber.pending.type,
 		};
-		const newState = orderReducer(curState, action);
-		expect(newState.ordersPending).toBe(true);
-		expect(newState.ordersError).toBe(null);
+		const newState = rootReducer(curState, action);
+		expect(newState).toEqual({
+			...curState,
+			orderReducer: {
+				...curState.orderReducer,
+				ordersPending: true,
+				ordersError: null,
+			},
+		});
 	});
 });

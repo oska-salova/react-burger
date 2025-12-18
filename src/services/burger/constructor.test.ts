@@ -1,5 +1,7 @@
+import { configureStore } from '@reduxjs/toolkit';
 import { BurgerIngredient } from '../../model/burger';
-import reducer, { burgerConstructorSlice } from './constructor';
+import { rootReducer, store as appStore } from '../store';
+import { burgerConstructorSlice, initialState as constructorInitialState } from './constructor';
 
 const testBunIngredient: BurgerIngredient = {
 	_id: '643d69a5c3f7b9001cfa093c',
@@ -35,63 +37,110 @@ const testUUID = '00000000-0000-0000-0000-000000000000';
 jest.mock('uuid', () => ({ v4: () => testUUID }));
 
 describe('Constructor reducers', () => {
-	it('should return initial state with no bun and empty ingredients', () => {
-		expect(reducer(undefined, { type: 'unknown' })).toEqual({ bun: null, ingredients: [] });
+	let store: typeof appStore;
+	let rootInitialState: ReturnType<typeof rootReducer>;
+
+	beforeEach(() => {
+		store = configureStore({ reducer: rootReducer });
+		rootInitialState = store.getState();
 	});
 
 	it('should set provided bun', () => {
+		const prevState = rootInitialState;
 		expect(
-			reducer(
-				{ bun: null, ingredients: [] },
-				burgerConstructorSlice.actions.setBun(testBunIngredient),
-			),
+			rootReducer(prevState, burgerConstructorSlice.actions.setBun(testBunIngredient)),
 		).toEqual({
-			bun: testBunIngredient,
-			ingredients: [],
+			...prevState,
+			burgerConstructorReducer: { ...constructorInitialState, bun: testBunIngredient },
 		});
 	});
 
 	it('should add provided ingredient', () => {
+		const prevState = {
+			...rootInitialState,
+			burgerConstructorReducer: { ...constructorInitialState, bun: testBunIngredient },
+		};
 		expect(
-			reducer(
-				{ bun: testBunIngredient, ingredients: [] },
+			rootReducer(
+				prevState,
 				burgerConstructorSlice.actions.addIngredient(testNutrientIngredient),
 			),
 		).toEqual({
-			bun: testBunIngredient,
-			ingredients: [{ ...testNutrientIngredient, uuid: testUUID }],
+			...prevState,
+			burgerConstructorReducer: {
+				...prevState.burgerConstructorReducer,
+				ingredients: [{ ...testNutrientIngredient, uuid: testUUID }],
+			},
 		});
 	});
 
 	it('should delete ingredient', () => {
 		const constructorIngredient = { ...testNutrientIngredient, uuid: testUUID };
+		const prevState = {
+			...rootInitialState,
+			burgerConstructorReducer: {
+				...constructorInitialState,
+				bun: testBunIngredient,
+				ingredients: [constructorIngredient],
+			},
+		};
 		expect(
-			reducer(
-				{
-					bun: testBunIngredient,
-					ingredients: [constructorIngredient],
-				},
+			rootReducer(
+				prevState,
 				burgerConstructorSlice.actions.deleteIngredient(constructorIngredient),
 			),
 		).toEqual({
-			bun: testBunIngredient,
-			ingredients: [],
+			...prevState,
+			burgerConstructorReducer: {
+				...prevState.burgerConstructorReducer,
+				ingredients: [],
+			},
+		});
+	});
+
+	it('should move ingredient to correct position', () => {
+		const testUUID1 = testUUID;
+		const testUUID2 = testUUID.replaceAll('0', '1');
+		const prevState = {
+			...rootInitialState,
+			burgerConstructorReducer: {
+				...constructorInitialState,
+				bun: testBunIngredient,
+				ingredients: [
+					{ ...testNutrientIngredient, uuid: testUUID1 },
+					{ ...testNutrientIngredient, uuid: testUUID2 },
+				],
+			},
+		};
+		expect(
+			rootReducer(
+				prevState,
+				burgerConstructorSlice.actions.moveIngredient({ fromIndex: 0, toIndex: 1 }),
+			),
+		).toEqual({
+			...prevState,
+			burgerConstructorReducer: {
+				...prevState.burgerConstructorReducer,
+				ingredients: [
+					{ ...testNutrientIngredient, uuid: testUUID2 },
+					{ ...testNutrientIngredient, uuid: testUUID1 },
+				],
+			},
 		});
 	});
 
 	it('should clear bun and ingredients', () => {
 		const constructorIngredient = { ...testNutrientIngredient, uuid: testUUID };
-		expect(
-			reducer(
-				{
-					bun: testBunIngredient,
-					ingredients: [constructorIngredient],
-				},
-				burgerConstructorSlice.actions.clear(),
-			),
-		).toEqual({
-			bun: null,
-			ingredients: [],
-		});
+		const prevState = {
+			...rootInitialState,
+			burgerConstructorReducer: {
+				...constructorInitialState,
+				bun: testBunIngredient,
+				ingredients: [constructorIngredient],
+			},
+		};
+		expect(rootReducer(prevState, burgerConstructorSlice.actions.clear())).toEqual(
+			rootInitialState,
+		);
 	});
 });
