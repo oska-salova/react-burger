@@ -27,7 +27,7 @@ const IngredientDetails = () => {
 		return <p className="text text_type_main-small">Получаем данные ...</p>;
 	}
 	return (
-		<section className={styles.details}>
+		<section className={styles.details} data-testid="ingredient-details">
 			<img src={ingredient.image_large} alt={ingredient.name} className="ml-4 mr-4" />
 			<p className="text text_type_main-small">{ingredient.name}</p>
 			<section className={styles.nutrients}>

@@ -27,7 +27,7 @@ const OrderDetails = () => {
 	}
 
 	return (
-		<section className={styles.details}>
+		<section className={styles.details} data-testid="order-details">
 			<p className={`${styles.orderId} text text_type_digits-large`}>{orderNumber}</p>
 			<p className="text text_type_main-small">идентификатор заказа</p>
 			{getOrderStatus(OrderStatus.done)}

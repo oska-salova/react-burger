@@ -9,7 +9,7 @@ type OrderHistoryState = {
 	error: string | null;
 };
 
-const initialState: OrderHistoryState = {
+export const initialState: OrderHistoryState = {
 	status: 'offline',
 	orders: null,
 	error: null,

@@ -35,7 +35,11 @@ const ConstructorBun: FC<ConstructorBunProps> = ({ type }) => {
 		: `constructor-element constructor-element_pos_${type} ${isHover ? 'dragHover' : ''}`;
 
 	return (
-		<div ref={dropTarget} className={`${containerClass} mr-4`}>
+		<div
+			ref={dropTarget}
+			className={`${containerClass} mr-4`}
+			data-testid={`constructor-bun-${type}`}
+		>
 			{selectedBun ? (
 				<ConstructorElement
 					type={type}

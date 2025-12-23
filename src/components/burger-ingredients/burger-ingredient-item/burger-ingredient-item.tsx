@@ -38,7 +38,12 @@ const BurgerIngredientItem: FC<BurgerIngredientItemProps> = memo(
 		});
 
 		return (
-			<div className={styles.item} onClick={handleIngredientClick} ref={ref}>
+			<div
+				className={styles.item}
+				onClick={handleIngredientClick}
+				ref={ref}
+				data-testid={`ingredient-${ingredient._id}`}
+			>
 				<img src={ingredient.image} alt={ingredient.name} className="ml-4 mr-4" />
 				<div className={`${styles.price} mt-1 mb-1`}>
 					<p className="text text_type_digits-default">{ingredient.price}</p>

@@ -1,0 +1,49 @@
+{
+	"success": true,
+	"name": "Краторный бургер",
+	"order": {
+		"ingredients": [
+			{
+				"_id": "643d69a5c3f7b9001cfa093c",
+				"name": "Краторная булка N-200i",
+				"type": "bun",
+				"proteins": 80,
+				"fat": 24,
+				"carbohydrates": 53,
+				"calories": 420,
+				"price": 1255,
+				"image": "https://code.s3.yandex.net/react/code/bun-02.png",
+				"image_mobile": "https://code.s3.yandex.net/react/code/bun-02-mobile.png",
+				"image_large": "https://code.s3.yandex.net/react/code/bun-02-large.png",
+				"__v": 0
+			},
+			{
+				"_id": "643d69a5c3f7b9001cfa093c",
+				"name": "Краторная булка N-200i",
+				"type": "bun",
+				"proteins": 80,
+				"fat": 24,
+				"carbohydrates": 53,
+				"calories": 420,
+				"price": 1255,
+				"image": "https://code.s3.yandex.net/react/code/bun-02.png",
+				"image_mobile": "https://code.s3.yandex.net/react/code/bun-02-mobile.png",
+				"image_large": "https://code.s3.yandex.net/react/code/bun-02-large.png",
+				"__v": 0
+			}
+		],
+		"_id": "6942a716a64177001b323df9",
+		"owner": {
+			"name": "Olga",
+			"email": "oska.salova@yandex.ru",
+			"createdAt": "2025-10-28T12:24:18.324Z",
+			"updatedAt": "2025-11-03T11:18:36.098Z"
+		},
+		"status": "done",
+		"name": "Краторный бургер",
+		"createdAt": "2025-12-17T12:50:30.807Z",
+		"updatedAt": "2025-12-17T12:50:31.126Z",
+		"number": 97423,
+		"price": 2510
+	}
+}

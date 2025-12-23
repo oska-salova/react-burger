@@ -8,16 +8,18 @@ import authReducer from './auth';
 import orderFeedReducer, { orderFeedWebSocketMiddleware } from './order-feed';
 import orderHistoryReducer, { orderHistoryWebSocketMiddleware } from './order-history';
 
+export const rootReducer = combineReducers({
+	ingredientsReducer,
+	burgerConstructorReducer,
+	orderReducer,
+	userReducer,
+	authReducer,
+	orderFeedReducer,
+	orderHistoryReducer,
+});
+
 export const store = configureStore({
-	reducer: combineReducers({
-		ingredientsReducer,
-		burgerConstructorReducer,
-		orderReducer,
-		userReducer,
-		authReducer,
-		orderFeedReducer,
-		orderHistoryReducer,
-	}),
+	reducer: rootReducer,
 	middleware: getDefaultMiddleware =>
 		getDefaultMiddleware({ serializableCheck: false }).concat([
 			orderFeedWebSocketMiddleware,
